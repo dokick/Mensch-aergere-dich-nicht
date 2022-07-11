@@ -1,21 +1,25 @@
-from turtle import Turtle, forward, pos, left, right
-from gameBoard import verticesForLeftTurn, verticesForRightTurn
+from turtle import Screen, Turtle, forward, pos, left, right
+from gameBoard import verticesForLeftTurn, verticesForRightTurn, gamePieceColors, homePositions
 from typing import Literal
 from tools import dice, convertVec2DToTuple
 
-speeds: str = ["fastest", "fast", "normal", "slow", "slowest"]
+speeds: list[str] = ["fastest", "fast", "normal", "slow", "slowest"]
 
 
 class GamePiece:
-    turtle = Turtle()
 
-    def __init__(self, *, color: str, speed: Literal["fastest", "fast", "normal", "slow", "slowest"]) -> None:
-        self.color = color
-        self.speed = speed
+    def __init__(self, *, color: str, id: Literal[1, 2, 3, 4], speed: Literal["fastest", "fast", "normal", "slow", "slowest"]) -> None:
+        self.turtle = Turtle()
+        self.color: str = color
+        self.id: int = id
+        screen = Screen()
+        screen.colormode(255)
+        self.turtle.fillcolor(gamePieceColors[self.color])
         self.turtle.speed(speed=speed)
+        self.turtle.shape("turtle")
 
     def __repr__(self) -> str:
-        return f"{self.color} colored game piece with {self.speed} speed"
+        return f"color: {self.color}\nid: {self.id}\nspeed: {self.turtle.speed()}"
 
     def move(self):
         for i in range(dice()):
@@ -24,6 +28,9 @@ class GamePiece:
             if self.getPos() in verticesForRightTurn:
                 self.turtle.right(90)
             self.turtle.forward(80)
+    
+    def isOnField(self) -> bool:
+        return self.getPos() not in homePositions
 
     def getPos(self):
         return convertVec2DToTuple(self.turtle.pos())
@@ -31,7 +38,7 @@ class GamePiece:
 
 def main():
     """For testing and debugging purposes"""
-    gamePiece = GamePiece("green", "fastest")
+    gamePiece = GamePiece(color="green", id=1, speed="fastest")
     print(gamePiece)
 
 

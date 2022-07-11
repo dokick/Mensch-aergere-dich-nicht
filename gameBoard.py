@@ -1,26 +1,34 @@
-from turtle import Turtle, exitonclick, shape, speed, fillcolor, pencolor, width, penup, pendown, goto, begin_fill, end_fill, seth, circle, left, right, forward, back, write
+from turtle import Turtle, exitonclick, hideturtle, shape, speed, fillcolor, pencolor, width, penup, pendown, goto, begin_fill, end_fill, seth, circle, left, right, forward, back, write
 
 # All x and y positions of the vertices where a game piece has to turn
 vertices: tuple = ((-80, -400), (-80, -80), (-400, -80), (-400, 80), (-80, 80),
                    (-80, 400), (80, 400), (80, 80), (400, 80), (400, -80), (80, -80), (80, -400))
 
-verticesForLeftTurn: tuple = ((-80, -80), (-80, 80), (80, 80), (80, -80))
+verticesForLeftTurn: tuple[tuple[int]] = (
+    (-80, -80), (-80, 80), (80, 80), (80, -80))
 
-verticesForRightTurn: tuple = ((-80, -400), (-400, -80), (-400, 80),
-                               (-80, 400), (80, 400), (400, 80), (400, -80), (80, -400))
+verticesForRightTurn: tuple[tuple[int]] = ((-80, -400), (-400, -80), (-400, 80),
+                                           (-80, 400), (80, 400), (400, 80), (400, -80), (80, -400))
 
-startingVertices: dict = {
+startingVertices: dict[str, tuple[int]] = {
     "yellow": (-400, 80), "green": (80, 400), "red": (400, -80), "black": (-80, -400)}
 
 # All target positions per color in a dictionary
-targetPositions = {"yellow": (), "green": (), "red": (), "black": ()}
+targetPositions: dict[str, tuple] = {
+    "yellow": (), "green": (), "red": (), "black": ()}
 
 # All starting positions per color in a dictionary
-homePositions = {"yellow": ((-390, 390), (-320, 390), (-390, 320), (-320, 320)), "green": ((320, 390), (390, 390), (320, 320), (390, 320)),
-                 "red": ((320, -320), (390, -320), (320, -390), (390, -390)), "black": ((-390, -320), (-320, -320), (-390, -390), (-320, -390))}
+homePositions: dict[str, tuple[tuple[int]]] = {"yellow": ((-390, 390), (-320, 390), (-390, 320), (-320, 320)), "green": ((320, 390), (390, 390), (320, 320), (390, 320)),
+                                               "red": ((320, -320), (390, -320), (320, -390), (390, -390)), "black": ((-390, -320), (-320, -320), (-390, -390), (-320, -390))}
+
+# All starting angles for the colors so starting them and setting them up for the start of the game becomes easier
+homeAngles: dict[str, int] = {"yellow": 90,
+                              "green": 0, "red": 270, "black": 180}
 
 # Order of colors beginning in the top left corner and then going clockwise: yellow, green, red, black
-colors: tuple = ("yellow", "green", "red", "black")
+colors: tuple[str] = ("yellow", "green", "red", "black")
+gamePieceColors: dict[str, tuple[int]] = {"yellow": (244, 249, 85), "green": (
+    15, 200, 11), "red": (176, 0, 0), "black": (64, 64, 64)}
 
 
 def gameBoard():
@@ -89,7 +97,7 @@ def gameBoard():
         penup()
     penup()
     seth(0)
-    fillcolor('blue')
+    fillcolor('black')
     y = -350
     for blau in range(2):
         goto(-390, y)
@@ -216,18 +224,20 @@ def gameBoard():
     school = 'Blackadder ITC'
     home = 'AR DECODE'
     goto(-210, 210)
-    write('Mensch', move=False, align='center', font=(home, 50, 'normal'))
+    write('Mensch', move=False, align='center', font=(school, 50, 'normal'))
     goto(210, 210)
-    write('ärgere', move=False, align='center', font=(home, 50, 'normal'))
+    write('ärgere', move=False, align='center', font=(school, 50, 'normal'))
     goto(-210, -280)
-    write('dich', move=False, align='center', font=(home, 50, 'normal'))
+    write('dich', move=False, align='center', font=(school, 50, 'normal'))
     goto(210, -280)
-    write('nicht', move=False, align='center', font=(home, 50, 'normal'))
+    write('nicht', move=False, align='center', font=(school, 50, 'normal'))
+    hideturtle()
 
 
 def main():
     """For testing and debugging purposes"""
     gameBoard()
+    exitonclick()
 
 
 if __name__ == "__main__":
