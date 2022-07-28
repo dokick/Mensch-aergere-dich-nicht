@@ -1,37 +1,41 @@
 from turtle import Turtle, exitonclick, hideturtle, shape, speed, fillcolor, pencolor, width, penup, pendown, goto, begin_fill, end_fill, seth, circle, left, right, forward, back, write
 
 # All x and y positions of the vertices where a game piece has to turn
-vertices: tuple = ((-80, -400), (-80, -80), (-400, -80), (-400, 80), (-80, 80),
-                   (-80, 400), (80, 400), (80, 80), (400, 80), (400, -80), (80, -80), (80, -400))
+vertices: tuple[tuple[int]] = ((-80, -400), (-80, -80), (-400, -80), (-400, 80), (-80, 80),
+                               (-80, 400), (80, 400), (80, 80), (400, 80), (400, -80), (80, -80), (80, -400))
 
-verticesForLeftTurn: tuple[tuple[int]] = (
+vertices_for_left_turn: tuple[tuple[int]] = (
     (-80, -80), (-80, 80), (80, 80), (80, -80))
 
-verticesForRightTurn: tuple[tuple[int]] = ((-80, -400), (-400, -80), (-400, 80),
-                                           (-80, 400), (80, 400), (400, 80), (400, -80), (80, -400))
+vertices_for_right_turn: tuple[tuple[int]] = ((-80, -400), (-400, -80), (-400, 80),
+                                              (-80, 400), (80, 400), (400, 80), (400, -80), (80, -400))
 
-startingVertices: dict[str, tuple[int]] = {
+starting_vertices: dict[str, tuple[int]] = {
     "yellow": (-400, 80), "green": (80, 400), "red": (400, -80), "black": (-80, -400)}
 
+# Coordinates of the vertices where game pieces of certain colors need to turn so they dont travel in an endless loop on the game board
+turning_vertices_per_color: dict[str, tuple[int]] = {
+    "yellow": (-400, 0), "green": (0, 400), "red": (400, 0), "black": (0, -400)}
+
 # All target positions per color in a dictionary
-targetPositions: dict[str, tuple] = {
-    "yellow": (), "green": (), "red": (), "black": ()}
+target_positions: dict[str, tuple[tuple[int]]] = {"yellow": ((-320, 0), (-240, 0), (-160, 0), (-80, 0)), "green": (
+    (0, 320), (0, 240), (0, 160), (0, 80)), "red": ((320, 0), (240, 0), (160, 0), (80, 0)), "black": ((0, -320), (0, -240), (0, -160), (0, -80))}
 
 # All starting positions per color in a dictionary
-homePositions: dict[str, tuple[tuple[int]]] = {"yellow": ((-390, 390), (-320, 390), (-390, 320), (-320, 320)), "green": ((320, 390), (390, 390), (320, 320), (390, 320)),
-                                               "red": ((320, -320), (390, -320), (320, -390), (390, -390)), "black": ((-390, -320), (-320, -320), (-390, -390), (-320, -390))}
+home_positions: dict[str, tuple[tuple[int]]] = {"yellow": ((-390, 390), (-320, 390), (-390, 320), (-320, 320)), "green": ((320, 390), (390, 390), (320, 320), (390, 320)),
+                                                "red": ((320, -320), (390, -320), (320, -390), (390, -390)), "black": ((-390, -320), (-320, -320), (-390, -390), (-320, -390))}
 
 # All starting angles for the colors so starting them and setting them up for the start of the game becomes easier
-homeAngles: dict[str, int] = {"yellow": 90,
-                              "green": 0, "red": 270, "black": 180}
+home_angles: dict[str, int] = {"yellow": 90,
+                               "green": 0, "red": 270, "black": 180}
 
 # Order of colors beginning in the top left corner and then going clockwise: yellow, green, red, black
 colors: tuple[str] = ("yellow", "green", "red", "black")
-gamePieceColors: dict[str, tuple[int]] = {"yellow": (244, 249, 85), "green": (
+game_piece_colors: dict[str, tuple[int]] = {"yellow": (244, 249, 85), "green": (
     15, 200, 11), "red": (176, 0, 0), "black": (64, 64, 64)}
 
 
-def gameBoard():
+def game_board():
     shape('turtle')
     speed('fastest')
     fillcolor('#fdeb95')
@@ -236,7 +240,8 @@ def gameBoard():
 
 def main():
     """For testing and debugging purposes"""
-    gameBoard()
+    game_board()
+
     exitonclick()
 
 

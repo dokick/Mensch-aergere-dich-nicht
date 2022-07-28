@@ -1,6 +1,6 @@
 from turtle import Turtle, exitonclick
 from random import choice
-from gameBoard import gameBoard, colors, targetPositions, homePositions, homeAngles
+from gameBoard import game_board, colors, target_positions, home_positions, home_angles
 from gamePiece import GamePiece
 from tools import dice
 
@@ -16,16 +16,16 @@ def setup(amountOfPlayers=4) -> dict[str, list[GamePiece]]:
     for color, gamePieces in players.items():
         for i, gamePiece in enumerate(gamePieces):
             gamePiece.turtle.penup()
-            gamePiece.turtle.seth(homeAngles[color])
-            gamePiece.turtle.goto(homePositions[color][i])
+            gamePiece.turtle.seth(home_angles[color])
+            gamePiece.turtle.goto(home_positions[color][i])
 
     return players
 
 
-def hasOnePlayerWon(players: dict) -> str | None:
+def has_one_player_won(players: dict[str, list[GamePiece]]) -> str | None:
     for color, gamePieces in players.items():
         for gamePiece in gamePieces:
-            if gamePiece.getPos() not in targetPositions(color):
+            if gamePiece.getPos() not in target_positions(color):
                 return None
             return color
 
@@ -37,22 +37,32 @@ def permission() -> bool:
     return False
 
 
-def startGame(amountOfPlayers=4):
+def move(gamePiece: GamePiece):
+    pass
+
+
+def start_game(amountOfPlayers=4):
     players = setup(amountOfPlayers)
-    startingColor = choice(colors)
-    indexOfStartingColor = colors.index(startingColor)
-    return
-    while not hasOnePlayerWon(players):
-        # players[startingColor][0]
-        indexOfStartingColor += 1
-        startingColor = colors[(indexOfStartingColor+1) % 4]
+    currentColor = choice(colors)
+    indexOfCurrentColor = colors.index(currentColor)
+    currentID = {"yellow": 1, "green": 1, "red": 1, "black": 1}
+
+    while not has_one_player_won(players):
+        for gamePiece in players[currentColor]:
+            if gamePiece.getID() == currentID[currentColor]:
+                move(gamePiece=gamePiece)
+        
+        
+        indexOfCurrentColor += 1
+        currentColor = colors[(indexOfCurrentColor+1) % 4]
+        indexOfCurrentColor = colors.index(currentColor)
         break
 
 
 def main():
 
-    gameBoard()
-    startGame()
+    game_board()
+    start_game()
     exitonclick()
     return
 
