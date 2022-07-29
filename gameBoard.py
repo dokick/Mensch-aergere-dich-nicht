@@ -7,8 +7,8 @@ vertices: tuple[tuple[int]] = ((-80, -400), (-80, -80), (-400, -80), (-400, 80),
 vertices_for_left_turn: tuple[tuple[int]] = (
     (-80, -80), (-80, 80), (80, 80), (80, -80))
 
-vertices_for_right_turn: tuple[tuple[int]] = ((-80, -400), (-400, -80), (-400, 80),
-                                              (-80, 400), (80, 400), (400, 80), (400, -80), (80, -400))
+vertices_for_right_turn: tuple[tuple[int]] = (
+    (-80, -400), (-400, -80), (-400, 80), (-80, 400), (80, 400), (400, 80), (400, -80), (80, -400))
 
 starting_vertices: dict[str, tuple[int]] = {
     "yellow": (-400, 80), "green": (80, 400), "red": (400, -80), "black": (-80, -400)}
@@ -35,7 +35,9 @@ game_piece_colors: dict[str, tuple[int]] = {"yellow": (244, 249, 85), "green": (
     15, 200, 11), "red": (176, 0, 0), "black": (64, 64, 64)}
 
 
-def game_board():
+def game_board() -> None:
+    """Draws a game board"""
+
     shape('turtle')
     speed('fastest')
     fillcolor('#fdeb95')
@@ -240,8 +242,8 @@ def game_board():
 
 def main():
     """For testing and debugging purposes"""
-    game_board()
 
+    game_board()
     exitonclick()
 
 

@@ -23,16 +23,29 @@ class GamePiece:
 
     def move(self) -> None:
         for i in range(dice()):
-            if self.getPos() in vertices_for_left_turn:
+            if self.get_pos() in vertices_for_left_turn:
                 self.turtle.left(90)
-            if self.getPos() in vertices_for_right_turn:
+            if self.get_pos() in vertices_for_right_turn:
                 self.turtle.right(90)
             self.turtle.forward(80)
     
     def is_on_field(self) -> bool:
-        return self.getPos() not in home_positions
+        """Returns if a game piece is on the field
+        
+        On field means anywhere on the field except the home positions
+        A game piece can already be on the target and that counts as true
+
+        Returns:
+        bool: true if game piece is on field, else false
+        """
+        return self.get_pos() not in home_positions
 
     def get_pos(self) -> tuple:
+        """Getter for the turtle's position
+
+        Returns:
+        tuple: turtle's position (x, y)
+        """
         return convert_Vec2D_to_tuple(self.turtle.pos())
     
     def get_ID(self) -> int:
@@ -41,8 +54,8 @@ class GamePiece:
 
 def main():
     """For testing and debugging purposes"""
-    gamePiece = GamePiece(color="green", id=1, speed="fastest")
-    print(gamePiece)
+    game_piece = GamePiece(color="green", id=1, speed="fastest")
+    print(game_piece)
 
 
 if __name__ == "__main__":

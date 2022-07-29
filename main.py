@@ -6,56 +6,61 @@ from tools import dice
 
 
 # TODO: setup() abhängig von der Anzahl an Spielern machen die spielen
-def setup(amountOfPlayers=4) -> dict[str, list[GamePiece]]:
+def setup(amount_of_players=4) -> dict[str, list[GamePiece]]:
     players: dict[str, list[GamePiece]] = {}
     for color in colors:
         players[color] = [GamePiece(color=color, id=i+1, speed="fastest")
                           for i in range(4)]
     # print(players)
 
-    for color, gamePieces in players.items():
-        for i, gamePiece in enumerate(gamePieces):
-            gamePiece.turtle.penup()
-            gamePiece.turtle.seth(home_angles[color])
-            gamePiece.turtle.goto(home_positions[color][i])
+    for color, game_pieces in players.items():
+        for i, game_piece in enumerate(game_pieces):
+            game_piece.turtle.penup()
+            game_piece.turtle.seth(home_angles[color])
+            game_piece.turtle.goto(home_positions[color][i])
 
     return players
 
 
 def has_one_player_won(players: dict[str, list[GamePiece]]) -> str | None:
-    for color, gamePieces in players.items():
-        for gamePiece in gamePieces:
-            if gamePiece.getPos() not in target_positions(color):
+    for color, game_pieces in players.items():
+        for game_piece in game_pieces:
+            if game_piece.get_pos() not in target_positions(color):
                 return None
             return color
 
 
 def permission() -> bool:
+    """Gives a game piece the permission to leave home and get on field
+    
+    Returns:
+    bool: true if the dice got a 6 in thrree throws
+    """
     for i in range(3):
         if dice() == 6:
             return True
     return False
 
 
-def move(gamePiece: GamePiece):
+def move(game_piece: GamePiece):
     pass
 
 
-def start_game(amountOfPlayers=4):
-    players = setup(amountOfPlayers)
-    currentColor = choice(colors)
-    indexOfCurrentColor = colors.index(currentColor)
-    currentID = {"yellow": 1, "green": 1, "red": 1, "black": 1}
+def start_game(amount_of_players=4):
+    players = setup(amount_of_players)
+    current_color = choice(colors)
+    index_of_current_color = colors.index(current_color)
+    current_ID = {"yellow": 1, "green": 1, "red": 1, "black": 1}
 
     while not has_one_player_won(players):
-        for gamePiece in players[currentColor]:
-            if gamePiece.getID() == currentID[currentColor]:
-                move(gamePiece=gamePiece)
+        for game_piece in players[current_color]:
+            if game_piece.get_ID() == current_ID[current_color]:
+                move(game_piece=game_piece)
         
         
-        indexOfCurrentColor += 1
-        currentColor = colors[(indexOfCurrentColor+1) % 4]
-        indexOfCurrentColor = colors.index(currentColor)
+        index_of_current_color += 1
+        current_color = colors[(index_of_current_color+1) % 4]
+        index_of_current_color = colors.index(current_color)
         break
 
 
