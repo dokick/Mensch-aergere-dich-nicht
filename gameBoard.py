@@ -1,5 +1,6 @@
 from turtle import Turtle, exitonclick, hideturtle, shape, speed, fillcolor, pencolor, width, penup, pendown, goto, begin_fill, end_fill, seth, circle, left, right, forward, back, write
 
+# TODO: Docs of what those data structures do, renaming those which are const
 # All x and y positions of the vertices where a game piece has to turn
 vertices: tuple[tuple[int]] = ((-80, -400), (-80, -80), (-400, -80), (-400, 80), (-80, 80),
                                (-80, 400), (80, 400), (80, 80), (400, 80), (400, -80), (80, -80), (80, -400))
@@ -30,11 +31,12 @@ home_angles: dict[str, int] = {"yellow": 90,
                                "green": 0, "red": 270, "black": 180}
 
 # Order of colors beginning in the top left corner and then going clockwise: yellow, green, red, black
-colors: tuple[str] = ("yellow", "green", "red", "black")
-game_piece_colors: dict[str, tuple[int]] = {"yellow": (244, 249, 85), "green": (
+COLORS: tuple[str] = ("yellow", "green", "red", "black")
+GAME_PIECE_COLORS: dict[str, tuple[int]] = {"yellow": (244, 249, 85), "green": (
     15, 200, 11), "red": (176, 0, 0), "black": (64, 64, 64)}
 
 
+# TODO: Make game board resizeable and dependent of desired size
 def game_board() -> None:
     """Draws a game board"""
 

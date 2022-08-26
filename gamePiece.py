@@ -1,12 +1,20 @@
 from turtle import Screen, Turtle, forward, pos, left, right
-from gameBoard import vertices_for_left_turn, vertices_for_right_turn, game_piece_colors, home_positions
+from gameBoard import vertices_for_left_turn, vertices_for_right_turn, GAME_PIECE_COLORS, home_positions, target_positions
 from typing import Literal
 from tools import dice, convert_Vec2D_to_tuple
 
-speeds: list[str] = ["fastest", "fast", "normal", "slow", "slowest"]
+SPEEDS: list[str] = ["fastest", "fast", "normal", "slow", "slowest"]
 
 
 class GamePiece:
+    # TODO: Docs
+    """
+    Attributes:
+        turtle
+
+    Methods:
+
+    """
 
     def __init__(self, *, color: str, id: Literal[1, 2, 3, 4], speed: Literal["fastest", "fast", "normal", "slow", "slowest"]) -> None:
         self.turtle = Turtle()
@@ -14,24 +22,28 @@ class GamePiece:
         self.id: int = id
         screen = Screen()
         screen.colormode(255)
-        self.turtle.fillcolor(game_piece_colors[self.color])
+        self.turtle.fillcolor(GAME_PIECE_COLORS[self.color])
         self.turtle.speed(speed=speed)
         self.turtle.shape("turtle")
 
     def __repr__(self) -> str:
         return f"color: {self.color}\nid: {self.id}\nspeed: {self.turtle.speed()}"
 
-    def move(self) -> None:
-        for i in range(dice()):
+    def move(self, steps: int) -> None:
+        # TODO: Docs
+        """
+        Returns:
+        """
+        for i in range(steps):
             if self.get_pos() in vertices_for_left_turn:
                 self.turtle.left(90)
             if self.get_pos() in vertices_for_right_turn:
                 self.turtle.right(90)
             self.turtle.forward(80)
-    
+
     def is_on_field(self) -> bool:
         """Returns if a game piece is on the field
-        
+
         On field means anywhere on the field except the home positions
         A game piece can already be on the target and that counts as true
 
@@ -40,6 +52,15 @@ class GamePiece:
         """
         return self.get_pos() not in home_positions
 
+    def is_playable(self) -> bool:
+        # TODO: Docs
+        """
+        Returns:
+        """
+        not_home = self.is_on_field()
+        in_target = self.get_pos() == target_positions[self.color][4-self.id]
+        return not_home and not in_target
+
     def get_pos(self) -> tuple:
         """Getter for the turtle's position
 
@@ -47,8 +68,13 @@ class GamePiece:
         tuple: turtle's position (x, y)
         """
         return convert_Vec2D_to_tuple(self.turtle.pos())
-    
+
     def get_ID(self) -> int:
+        """ Getter for game pieces id
+
+        Returns:
+        int: game pieces id
+        """
         return self.id
 
 
