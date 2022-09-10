@@ -1,49 +1,11 @@
 from turtle import Turtle, exitonclick
 from random import choice
-from gameBoard import game_board, COLORS, target_positions, home_positions, home_angles
+from gameBoard import game_board, COLORS, target_positions, home_positions, home_angles, enough_vertices_per_color
 from gamePiece import GamePiece
 from tools import dice
 
 
-# TODO: setup() abhängig von der Anzahl an Spielern machen die spielen
-def setup(amount_of_players=4) -> tuple[dict[str, list[GamePiece]], str]:
-    """A setup function so the game can start with initial values
-
-    Args:
-        amount_of_players (int): the amount of players in the game
-
-    Returns:
-        tuple: first a dict with all the players, second the color that starts the game
-    """
-    players: dict[str, list[GamePiece]] = {}
-    for color in COLORS:
-        players[color] = [GamePiece(color=color, id=i+1, speed="fastest")
-                          for i in range(4)]
-    # print(players)
-
-    for color, game_pieces in players.items():
-        for i, game_piece in enumerate(game_pieces):
-            game_piece.turtle.penup()
-            game_piece.turtle.seth(home_angles[color])
-            game_piece.turtle.goto(home_positions[color][i])
-
-    current_color = choice(COLORS)
-
-    return players, current_color
-
-
-def validate_move(current_game_piece: GamePiece, steps: int) -> bool:
-    """Validates a move (is the move possible)
-
-    Args:
-        current_game_piece (GamePiece): game piece that makes the move
-        steps (int): amount of steps the game piece goes
-    
-    Returns:
-        bool: true if move is valid
-    """
-    # TODO: Implementation
-    return
+######################################### helper functions #########################################
 
 
 def did_player_hit_other_players(*, player_being_checked: GamePiece, players: dict[str, list[GamePiece]]) -> GamePiece:
@@ -107,6 +69,8 @@ def has_one_player_won(players: dict[str, list[GamePiece]]) -> str | None:
                 return None
             return color
 
+######################################### End of helper functions #########################################
+
 
 def permission() -> bool:
     """Gives a game piece the permission to leave home and get on field
@@ -120,7 +84,27 @@ def permission() -> bool:
     return False
 
 
-def move(current_game_piece: GamePiece, players: dict[str, list[GamePiece]]):
+def validate_move(*, current_game_piece: GamePiece, steps: int, players: dict[str, list[GamePiece]]) -> bool:
+    """Validates a move (is the move possible)
+
+    Args:
+        current_game_piece (GamePiece): game piece that makes the move
+        steps (int): amount of steps the game piece goes
+        players (dict): information of all players
+
+    Returns:
+        bool: true if move is valid
+    """
+    # TODO: Implementation
+    temporary_game_piece = current_game_piece.copy()
+    temporary_game_piece.move(steps)
+    for game_piece in players[current_game_piece.color]:
+        if game_piece.get_pos() == temporary_game_piece.get_pos():
+            return False
+    return True
+
+
+def move(*, current_game_piece: GamePiece, players: dict[str, list[GamePiece]]):
     """Simulates and also handles the move in the game
 
     Args:
@@ -128,14 +112,43 @@ def move(current_game_piece: GamePiece, players: dict[str, list[GamePiece]]):
         players (dict): information of all players
     """
     # if color has no game piece to play with, player has to get a new game piece on the board
+    # TODO: Refactor (next 4 lines shouldn't be here)
     if not has_color_one_player_outside(current_game_piece=current_game_piece, players=players):
         if permission():
             current_game_piece.move(dice())
             return
 
     steps = dice()
-    if validate_move(current_game_piece, steps):
+    if validate_move(current_game_piece=current_game_piece, steps=steps, players=players):
         current_game_piece.move(steps)
+
+# TODO: setup() abhängig von der Anzahl an Spielern machen die spielen
+
+
+def setup(amount_of_players=4) -> tuple[dict[str, list[GamePiece]], str]:
+    """A setup function so the game can start with initial values
+
+    Args:
+        amount_of_players (int): the amount of players in the game (not implemented yet)
+
+    Returns:
+        tuple: first a dict with all the players, second the color that starts the game
+    """
+    players: dict[str, list[GamePiece]] = {}
+    for color in COLORS:
+        players[color] = [GamePiece(color=color, id=i+1, speed="fastest")
+                          for i in range(4)]
+    # print(players)
+
+    for color, game_pieces in players.items():
+        for i, game_piece in enumerate(game_pieces):
+            game_piece.turtle.penup()
+            game_piece.turtle.seth(home_angles[color])
+            game_piece.turtle.goto(home_positions[color][i])
+
+    current_color = choice(COLORS)
+
+    return players, current_color
 
 
 def start_game(amount_of_players=4):
@@ -150,7 +163,7 @@ def start_game(amount_of_players=4):
 
     while not has_one_player_won(players):
         current_game_piece = players[current_color][current_ID[current_color]]
-        move(current_game_piece, players)
+        move(current_game_piece=current_game_piece, players=players)
 
         # for game_piece in players[current_color]:
         #     if game_piece.get_ID() == current_ID[current_color]:
@@ -168,7 +181,6 @@ def main():
     game_board()
     start_game()
     exitonclick()
-    return
 
 
 if __name__ == "__main__":

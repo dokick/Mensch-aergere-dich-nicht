@@ -18,6 +18,9 @@ starting_vertices: dict[str, tuple[int]] = {
 turning_vertices_per_color: dict[str, tuple[int]] = {
     "yellow": (-400, 0), "green": (0, 400), "red": (400, 0), "black": (0, -400)}
 
+enough_vertices_per_color: dict[str, tuple[tuple[int]]] = {"yellow": ((-400, 0), (-400, -80)), "green": (
+    (0, 400), (-80, 400)), "red": ((400, 0), (400, 80)), "black": ((0, -400), (80, -400))}
+
 # All target positions per color in a dictionary
 target_positions: dict[str, tuple[tuple[int]]] = {"yellow": ((-320, 0), (-240, 0), (-160, 0), (-80, 0)), "green": (
     (0, 320), (0, 240), (0, 160), (0, 80)), "red": ((320, 0), (240, 0), (160, 0), (80, 0)), "black": ((0, -320), (0, -240), (0, -160), (0, -80))}

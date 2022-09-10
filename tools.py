@@ -6,22 +6,22 @@ def dice() -> int:
     """Simulates rolling a dice
 
     Returns:
-    int: Random betweeen 1 and 6
+        int: Random integer betweeen 1 and 6
     """
     return randint(1, 6)
 
 
-def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple:
+def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[int | float]:
     """Converting a Vec2D Vector from turtle
 
     Used for getting the position of a turtle and not worry about compatibility issues
     It is maybe theoretically possible to get a not intended output, because we are dealing with a 2D plane and just interested in the two first elements
 
-    Parameters:
-    pos (Vec2D): turtle's position
+    Args:
+        pos (Vec2D): turtle's position
 
     Returns:
-    tuple: turtle's position (x, y)
+        tuple: turtle's position (x, y)
     """
     return (pos[0], pos[1])
 
