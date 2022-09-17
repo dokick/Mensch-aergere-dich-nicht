@@ -1,75 +1,51 @@
-from turtle import Turtle, exitonclick
+from turtle import exitonclick
 from random import choice
-from gameBoard import game_board, COLORS, target_positions, home_positions, home_angles, enough_vertices_per_color
+from player import Player
 from gamePiece import GamePiece
+from gameBoard import game_board, HOME_ANGLES, COLORS, home_positions, target_positions, enough_vertices_per_color
 from tools import dice
 
+"""
+Behaviour of players:
 
-######################################### helper functions #########################################
+- First priority is it to get the furthest game piece into one of the final positions, no matter the risks or tactical advantages for other game pieces
+- If the player rolls a 1, 2 or 3 with the dice the player will use that on game pieces that aren't all the way deep in the final positions, if theres no tactical disadvantage for other game pieces
+
+Rules:
+
+When can a player/game piece NOT move
+- If the player has no game pieces on a playing field (Handled in make_a_move())
+- If there are not enough fields that a game piece can move
+- If the game piece would land on a field with a game piece of the same color
+"""
+
+######################################## Start of game mechanics ########################################
 
 
-def did_player_hit_other_players(*, player_being_checked: GamePiece, players: dict[str, list[GamePiece]]) -> GamePiece:
+def did_player_hit_other_players(*, player_being_checked: Player, players: list[Player]) -> GamePiece:
     """Helper function for the implementation of the game mechanic that players can hit other players
 
     Args:
-        player_being_checked (GamePiece): the game piece that made a move
-        players (dict): information of all players
+        player_being_checked (Player): the game piece that made a move
+        players (list[Player]): information of all players
 
     Returns:
         GamePiece: Returns the game piece that got hit by another player
     """
+    for player in players:
+        if player.color == player_being_checked.color:
+            continue
+        for game_piece in player.game_pieces:
+            if game_piece.get_pos() == player_being_checked.get_current_game_piece().get_pos():
+                return game_piece
+
+    # Old alternative but the code above doesnt quite work yet thats why its not deleted yet
     for color, game_pieces in players.items():
         if color == player_being_checked.color:
             continue
         for game_piece in game_pieces:
             if player_being_checked.get_pos() == game_piece.get_pos():
                 return game_piece
-
-
-def is_game_piece_in_goal(player_being_checked: GamePiece) -> bool:
-    """Helper function for getting if game piece is in goal positions
-
-    Args:
-        player_being_checked (GamePiece): game piece that makes the move
-
-    Returns:
-        bool: true if the game piece that made a move is already in one of the goal positions
-    """
-    return player_being_checked in target_positions
-
-
-def has_color_one_player_outside(*, current_game_piece: GamePiece, players: dict[str, list[GamePiece]]) -> bool:
-    """Checks if a player of one color has one of its game pieces on the board playing
-
-    Args:
-        current_game_piece (GamePiece): the game piece that makes the move
-        players (dict): information of all players
-
-    Returns:
-        bool: true if at least one game piece of the color is on the board and playable
-    """
-    for game_piece in players[current_game_piece.color]:
-        if game_piece.is_playable():
-            return True
-    return False
-
-
-def has_one_player_won(players: dict[str, list[GamePiece]]) -> str | None:
-    """Checks if a color has won yet
-
-    Args:
-        players (dict): information of all players
-
-    Returns:
-        str | None: the color of the winning player or None if no one has won yet
-    """
-    for color, game_pieces in players.items():
-        for game_piece in game_pieces:
-            if game_piece.get_pos() not in target_positions[color]:
-                return None
-            return color
-
-######################################### End of helper functions #########################################
 
 
 def permission() -> bool:
@@ -84,48 +60,80 @@ def permission() -> bool:
     return False
 
 
-def validate_move(*, current_game_piece: GamePiece, steps: int, players: dict[str, list[GamePiece]]) -> bool:
-    """Validates a move (is the move possible)
-
-    Args:
-        current_game_piece (GamePiece): game piece that makes the move
-        steps (int): amount of steps the game piece goes
-        players (dict): information of all players
-
-    Returns:
-        bool: true if move is valid
-    """
-    # TODO: Implementation
-    temporary_game_piece = current_game_piece.copy()
-    temporary_game_piece.move(steps)
-    for game_piece in players[current_game_piece.color]:
-        if game_piece.get_pos() == temporary_game_piece.get_pos():
-            return False
-    return True
-
-
-def move(*, current_game_piece: GamePiece, players: dict[str, list[GamePiece]]):
+def make_a_move(*, current_player: Player, players: list[Player]) -> None:
     """Simulates and also handles the move in the game
 
+    If a player has no game pieces to play with, the player has to get a new game piece on the board
+    Otherwise the move gets validated and then the player moves
+
     Args:
-        current_game_piece (GamePiece): the game piece that makes a move
-        players (dict): information of all players
+        current_player (Player): the player that has the current turn
+        players (list[Player]): information of all players
     """
-    # if color has no game piece to play with, player has to get a new game piece on the board
-    # TODO: Refactor (next 4 lines shouldn't be here)
-    if not has_color_one_player_outside(current_game_piece=current_game_piece, players=players):
+    if not has_player_at_least_one_game_piece_on_game_board(current_player):
         if permission():
-            current_game_piece.move(dice())
+            current_player.move(dice())
             return
 
     steps = dice()
-    if validate_move(current_game_piece=current_game_piece, steps=steps, players=players):
-        current_game_piece.move(steps)
+    if current_player.validate_moves(steps=steps, players=players):
+        current_player.move(steps)
+######################################## End of game mechanics ########################################
 
-# TODO: setup() abhängig von der Anzahl an Spielern machen die spielen
+######################################## Start of helper functions ########################################
 
 
-def setup(amount_of_players=4) -> tuple[dict[str, list[GamePiece]], str]:
+def is_game_piece_in_goal(game_piece_being_checked: GamePiece) -> bool:
+    """Helper function for getting if game piece is in goal positions
+
+    Args:
+        game_piece_being_checked (GamePiece): game piece that makes the move
+
+    Returns:
+        bool: true if the game piece that made a move is already in one of the goal positions
+    """
+    return game_piece_being_checked in target_positions
+
+
+def has_player_at_least_one_game_piece_on_game_board(current_player: Player) -> bool:
+    """Checks if a player has at least one of it's game pieces on the board playing
+
+    Args:
+        current_player (Player): the player that has the current turn
+        players (list[Player]): information of all players
+
+    Returns:
+        bool: true if at least one game piece of the color is on the board
+    """
+    for game_piece in current_player.game_pieces:
+        if game_piece.is_on_field():
+            return True
+    return False
+
+
+def has_one_player_won(players: list[Player]) -> Player | None:
+    """Checks if a player has won yet
+
+    Args:
+        players (list[Player]): information of all players
+
+    Returns:
+        Player | None: the winning player or None if no one has won yet
+    """
+    # TODO: more deep check necessary if a player has actually won
+    for player in players:
+        for game_piece in player.game_pieces:
+            if game_piece.get_pos() not in target_positions[player.color]:
+                return None
+        return player
+
+######################################## End of helper functions ########################################
+
+######################################## Start of setup & game loop ########################################
+
+
+def setup(amount_of_players=4) -> tuple[list[Player], Player]:
+    # TODO: setup() abhängig von der Anzahl an Spielern machen die spielen
     """A setup function so the game can start with initial values
 
     Args:
@@ -134,52 +142,47 @@ def setup(amount_of_players=4) -> tuple[dict[str, list[GamePiece]], str]:
     Returns:
         tuple: first a dict with all the players, second the color that starts the game
     """
-    players: dict[str, list[GamePiece]] = {}
+    players: list[Player] = []
     for color in COLORS:
-        players[color] = [GamePiece(color=color, id=i+1, speed="fastest")
-                          for i in range(4)]
-    # print(players)
+        players.append(Player(color=color, game_pieces=[GamePiece(
+            color=color, id=i+1, speed="fastest") for i in range(4)]))
 
-    for color, game_pieces in players.items():
-        for i, game_piece in enumerate(game_pieces):
-            game_piece.turtle.penup()
-            game_piece.turtle.seth(home_angles[color])
-            game_piece.turtle.goto(home_positions[color][i])
+    for player in players:
+        for idx, game_piece in enumerate(player.game_pieces):
+            game_piece.turtle.seth(HOME_ANGLES[color])
+            # TODO: This should work without index, maybe make the home position of a game piece an attribute
+            game_piece.turtle.goto(home_positions[color][idx])
 
-    current_color = choice(COLORS)
+    starting_player = choice(players)
 
-    return players, current_color
+    return players, starting_player
 
 
-def start_game(amount_of_players=4):
-    """Starts the game
+def start_game_loop(amount_of_players=4):
+    """Starts the game loop
+
+    Loop works as follows:
+    - move the current player (validation and handling happens in move or in subfunctions of move)
+    - set the next player for the next iteration
 
     Args:
         amount_of_players (int): the amount of players that are playing (not implemented yet)
     """
-    players, current_color = setup(amount_of_players)
-    index_of_current_color = COLORS.index(current_color)
-    current_ID = {"yellow": 1, "green": 1, "red": 1, "black": 1}
+    players, current_player = setup(amount_of_players)
+    index_of_current_player = players.index(current_player)
 
     while not has_one_player_won(players):
-        current_game_piece = players[current_color][current_ID[current_color]]
-        move(current_game_piece=current_game_piece, players=players)
+        make_a_move(current_player=current_player, players=players)
+        index_of_current_player += 1
+        current_player = players[(index_of_current_player+1) % 4]
+        break  # TODO: This will be deleted in the future
 
-        # for game_piece in players[current_color]:
-        #     if game_piece.get_ID() == current_ID[current_color]:
-        #         move(game_piece=game_piece)
-
-        if is_game_piece_in_goal(current_game_piece):
-            current_ID[current_game_piece.color] += 1
-
-        index_of_current_color += 1
-        current_color = COLORS[(index_of_current_color+1) % 4]
-        break
+######################################## End of start & game loop ########################################
 
 
 def main():
     game_board()
-    start_game()
+    start_game_loop()
     exitonclick()
 
 

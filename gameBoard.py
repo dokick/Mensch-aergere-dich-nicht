@@ -1,4 +1,4 @@
-from turtle import Turtle, exitonclick, hideturtle, shape, speed, fillcolor, pencolor, width, penup, pendown, goto, begin_fill, end_fill, seth, circle, left, right, forward, back, write
+from turtle import exitonclick, hideturtle, shape, speed, fillcolor, pencolor, width, penup, pendown, goto, begin_fill, end_fill, seth, circle, left, right, forward, back, write
 
 # TODO: Docs of what those data structures do, renaming those which are const
 # All x and y positions of the vertices where a game piece has to turn
@@ -30,7 +30,7 @@ home_positions: dict[str, tuple[tuple[int]]] = {"yellow": ((-390, 390), (-320, 3
                                                 "red": ((320, -320), (390, -320), (320, -390), (390, -390)), "black": ((-390, -320), (-320, -320), (-390, -390), (-320, -390))}
 
 # All starting angles for the colors so starting them and setting them up for the start of the game becomes easier
-home_angles: dict[str, int] = {"yellow": 90,
+HOME_ANGLES: dict[str, int] = {"yellow": 90,
                                "green": 0, "red": 270, "black": 180}
 
 # Order of colors beginning in the top left corner and then going clockwise: yellow, green, red, black

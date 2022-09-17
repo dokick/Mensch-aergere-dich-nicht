@@ -1,6 +1,6 @@
 from turtle import Screen, Turtle, forward, pos, left, right
-from gameBoard import vertices_for_left_turn, vertices_for_right_turn, GAME_PIECE_COLORS, home_positions, target_positions, turning_vertices_per_color
 from typing import Literal
+from gameBoard import vertices_for_left_turn, vertices_for_right_turn, GAME_PIECE_COLORS, home_positions, target_positions, turning_vertices_per_color
 from tools import convert_Vec2D_to_tuple
 
 SPEEDS: list[str] = ["fastest", "fast", "normal", "slow", "slowest"]
@@ -29,16 +29,19 @@ class GamePiece:
         self.turtle = Turtle()
         self.color: str = color
         self.id: int = id
+        self.steps: int = 0
+
         screen = Screen()
         screen.colormode(255)
         self.turtle.fillcolor(GAME_PIECE_COLORS[self.color])
         self.turtle.speed(speed=speed)
         self.turtle.shape("turtle")
+        self.turtle.penup()
 
     def __repr__(self) -> str:
         return f"color: {self.color}\nid: {self.id}\nspeed: {self.turtle.speed()}"
 
-    def move(self, steps: int) -> None:
+    def move(self, steps: int):
         # TODO: Docs
         """
 
@@ -51,15 +54,17 @@ class GamePiece:
             if self.get_pos() in vertices_for_right_turn or self.get_pos() == turning_vertices_per_color[self.color]:
                 self.turtle.right(90)
             self.turtle.forward(80)
-    
+            self.steps += 1
+        return self
+
     def copy(self):
-        # TODO Error fixing
         """Makes a copy of the game piece
 
         Returns:
             GamePiece: copy of self
         """
         tmp = GamePiece(color=self.color, id=self.id, speed=self.turtle.speed())
+        tmp.turtle = self.turtle # TODO: This could lead to problems, a better approach would be to calculate the future position to avoid copying an object
         return tmp
 
     def is_on_field(self) -> bool:
