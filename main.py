@@ -8,8 +8,11 @@ from tools import dice
 """
 Behaviour of players:
 
-- First priority is it to get the furthest game piece into one of the final positions, no matter the risks or tactical advantages for other game pieces
-- If the player rolls a 1, 2 or 3 with the dice the player will use that on game pieces that aren't all the way deep in the final positions, if theres no tactical disadvantage for other game pieces
+-   First priority is it to get the furthest game piece into one of the final positions,
+    no matter the risks or tactical advantages for other game pieces
+-   If the player rolls a 1, 2 or 3 with the dice the player will use that on game pieces
+    that aren't all the way deep in the final positions,
+    if there's no tactical disadvantage for other game pieces
 
 Rules:
 
@@ -17,35 +20,39 @@ When can a player/game piece NOT move
 - If the player has no game pieces on a playing field (Handled in make_a_move())
 - If there are not enough fields that a game piece can move
 - If the game piece would land on a field with a game piece of the same color
+
+Implemented Features:
+
+- Player hitting other players
+- Rolling the dice three times if no moves available
+
+Not Yet Implemented Features:
+
+- When a player rolls a 6, but his game pieces can't move, a new game piece will come out
+- Rolling a 6 leads to making a move again
+- Deep check for when a player has won
 """
 
 ######################################## Start of game mechanics ########################################
 
 
-def did_player_hit_other_players(*, player_being_checked: Player, players: list[Player]) -> GamePiece:
+def did_player_hit_other_players(*, game_piece_being_checked: GamePiece, players: list[Player]) -> GamePiece | None:
     """Helper function for the implementation of the game mechanic that players can hit other players
 
     Args:
-        player_being_checked (Player): the game piece that made a move
+        game_piece_being_checked (GamePiece): the game piece that made a move
         players (list[Player]): information of all players
 
     Returns:
         GamePiece: Returns the game piece that got hit by another player
     """
     for player in players:
-        if player.color == player_being_checked.color:
+        if player.color == game_piece_being_checked.color:
             continue
         for game_piece in player.game_pieces:
-            if game_piece.get_pos() == player_being_checked.get_current_game_piece().get_pos():
+            if game_piece.get_pos() == game_piece_being_checked.get_pos():
                 return game_piece
-
-    # Old alternative but the code above doesnt quite work yet thats why its not deleted yet
-    for color, game_pieces in players.items():
-        if color == player_being_checked.color:
-            continue
-        for game_piece in game_pieces:
-            if player_being_checked.get_pos() == game_piece.get_pos():
-                return game_piece
+    return None
 
 
 def permission() -> bool:
@@ -75,24 +82,16 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
             current_player.move(dice())
             return
 
-    current_player.move(dice())
+    current_game_piece = current_player.move(dice())
+    kicked_out_game_piece: GamePiece | None = did_player_hit_other_players(
+        current_game_piece, players)
+    if kicked_out_game_piece:
+        kicked_out_game_piece.reset()
 
 
 ######################################## End of game mechanics ########################################
 
 ######################################## Start of helper functions ########################################
-
-
-def is_game_piece_in_goal(game_piece_being_checked: GamePiece) -> bool:
-    """Helper function for getting if game piece is in goal positions
-
-    Args:
-        game_piece_being_checked (GamePiece): game piece that makes the move
-
-    Returns:
-        bool: true if the game piece that made a move is already in one of the goal positions
-    """
-    return game_piece_being_checked in goal_positions
 
 
 def has_player_at_least_one_game_piece_on_game_board(current_player: Player) -> bool:
@@ -120,13 +119,15 @@ def has_one_player_won(players: list[Player]) -> Player | None:
     Returns:
         Player | None: the winning player or None if no one has won yet
     """
-    # TODO: more deep check necessary if a player has actually won
     for player in players:
+        has_player_won = True
         for game_piece in player.game_pieces:
             if game_piece.get_pos() not in goal_positions[player.color]:
-                return None
-        return player
-
+                has_player_won = False
+                break
+        if has_player_won:
+            return player
+    return None
 
 ######################################## End of helper functions ########################################
 
@@ -146,13 +147,12 @@ def setup(amount_of_players=4) -> tuple[list[Player], Player]:
     players: list[Player] = []
     for color in COLORS:
         players.append(Player(color=color, game_pieces=[
-                       GamePiece(color) for i in range(4)]))
+            GamePiece(color, home_positions[color][i]) for i in range(4)]))
 
     for player in players:
-        for idx, game_piece in enumerate(player.game_pieces):
+        for game_piece in player.game_pieces:
             game_piece.turtle.seth(HOME_ANGLES[color])
-            # TODO: This should work without index, maybe make the home position of a game piece an attribute
-            game_piece.turtle.goto(home_positions[color][idx])
+            game_piece.turtle.goto(game_piece.home_position)
 
     starting_player = choice(players)
 

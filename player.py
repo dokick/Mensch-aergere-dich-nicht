@@ -1,5 +1,5 @@
 from gamePiece import GamePiece
-from gameBoard import goal_positions, enough_vertices_per_color
+from gameBoard import goal_positions, home_positions, enough_vertices_per_color
 
 
 class Player:
@@ -23,7 +23,7 @@ class Player:
         self.game_pieces = game_pieces
 
     def __bool__(self) -> bool:
-        """The existence of a player should be treated as True"""
+        """Existence of a player should be treated as True"""
         return True
 
     def __repr__(self) -> str:
@@ -76,7 +76,7 @@ class Player:
                     continue
                 final_game_pieces.append(game_piece)
 
-    def pick_game_piece(self, steps: int) -> GamePiece:
+    def pick_game_piece(self, steps: int) -> GamePiece | None:
         """Gets all the valid game pieces and picks a final game piece
 
         Deciding mechanisms can be implemented here
@@ -87,27 +87,37 @@ class Player:
         Returns:
             GamePiece: the game piece that gets finally picked for the move
         """
-        # TODO: First priority implemented but not second priority
         game_pieces = self.get_valid_game_pieces(steps)
+        if not game_pieces:
+            return None
+
+        if steps < 4:
+            for game_piece in game_pieces:
+                if game_piece.where_in_goal_index() >= steps:
+                    return game_piece
+
         pick = game_pieces[0]
         for game_piece in game_pieces:
             if game_piece.steps > pick.steps:
                 pick = game_piece
         return pick
 
-    def move(self, steps: int) -> None:
+    def move(self, steps: int) -> GamePiece:
         """Makes the move for a player
 
         Args:
             steps (int): amount of steps the game piece goes
         """
         current_game_piece = self.pick_game_piece(steps)
-        current_game_piece.move(steps)
+        if not current_game_piece:
+            return
+        return current_game_piece.move(steps)
 
 
 def main():
-    player = Player(color="yellow", game_pieces=[
-                    GamePiece("yellow") for i in range(4)])
+    color = "yellow"
+    player = Player(color=color, game_pieces=[
+                    GamePiece(color, home_positions[color][i]) for i in range(4)])
     print(player)
     print(bool(player))  # True
     print(not player)  # False

@@ -14,17 +14,20 @@ class GamePiece:
 
     Methods:
         __init__(self, color: str, *, speed: str = "fastest") -> None
+        __bool__(self) -> bool
         __repr__(self) -> str
         move(self, steps: int)
         get_future_pos(self, steps: int) -> tuple[int | float]
         is_on_field(self) -> bool
-        is_playable(self) -> bool
+        is_in_goal(self) -> bool
+        where_in_goal_index(self) -> int
         get_pos(self) -> tuple
     """
 
-    def __init__(self, color: str, *, speed: str = "fastest") -> None:
+    def __init__(self, color: str, home_position: tuple[int | float], *, speed: str = "fastest") -> None:
         self.turtle = Turtle()
         self.color: str = color
+        self.home_position = home_position
         self.steps: int = 0
 
         screen = Screen()
@@ -33,6 +36,10 @@ class GamePiece:
         self.turtle.speed(speed=speed)
         self.turtle.shape("turtle")
         self.turtle.penup()
+
+    def __bool__(self) -> bool:
+        """Existence of a game piece means true"""
+        return True
 
     def __repr__(self) -> str:
         return f"color: {self.color}\nid: {self.id}\nspeed: {self.turtle.speed()}"
@@ -51,18 +58,6 @@ class GamePiece:
             self.turtle.forward(80)
             self.steps += 1
         return self
-
-    def copy(self):
-        """Makes a copy of the game piece
-
-        Returns:
-            GamePiece: copy of self
-        """
-        tmp = GamePiece(color=self.color, id=self.id,
-                        speed=self.turtle.speed())
-        # TODO: This could lead to problems, a better approach would be to calculate the future position to avoid copying an object
-        tmp.turtle = self.turtle
-        return tmp
 
     def get_future_pos(self, steps: int) -> tuple[int | float]:
         """Method for getting the furure position of the game piece's turtle
@@ -102,17 +97,25 @@ class GamePiece:
         """
         return self.get_pos() not in home_positions
 
-    def is_playable(self) -> bool:
-        # TODO: Renaming or refactoring cause it doesn't check fully if the game piece is playable, maybe useless
-        """Checks if game piece is not in home positions and not in target positions
-
-        Returns:
-            bool: true if game piece is playable
+    def is_in_goal(self) -> bool:
         """
-        # TODO: Should be deleted
-        not_home = self.is_on_field()
-        in_target = self.get_pos() == goal_positions[self.color][4-self.id]
-        return not_home and not in_target
+        Returns:
+            bool:
+        """
+        return self.get_pos() in goal_positions
+
+    def where_in_goal_index(self) -> int:
+        """
+        Returns:
+            int:
+        """
+        if self.is_in_goal():
+            for idx, coord in enumerate(goal_positions[self.color]):
+                if coord == self.get_pos():
+                    return idx
+
+    def reset(self):
+        self.turtle.goto(self.home_position)
 
     def get_pos(self) -> tuple[int | float]:
         """Getter for the turtle's position
@@ -125,7 +128,7 @@ class GamePiece:
 
 def main():
     """For testing and debugging purposes"""
-    game_piece = GamePiece("green")
+    game_piece = GamePiece("green", (100, 100))
     print(game_piece)
 
 
