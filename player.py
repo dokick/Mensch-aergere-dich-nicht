@@ -13,12 +13,13 @@ class Player:
         __init__(self, *, color: str, game_pieces: list[GamePiece]) -> None
         __bool__(self) -> bool
         __repr__(self) -> str
-        get_valid_game_pieces(self, *, steps: int) -> list[GamePiece]
+        get_valid_game_pieces(self, steps: int) -> list[GamePiece]
+        pick_game_piece(self, steps: int) -> GamePiece
         move(self, steps: int) -> None
-        pick_game_piece(self, game_pieces: list[GamePiece]) -> GamePiece
     """
 
     def __init__(self, *, color: str, game_pieces: list[GamePiece]) -> None:
+        """Initializing attributes"""
         self.color = color
         self.game_pieces = game_pieces
 

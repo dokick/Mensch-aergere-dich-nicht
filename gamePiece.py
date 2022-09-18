@@ -2,8 +2,6 @@ from turtle import Screen, Turtle, forward, pos, left, right
 from gameBoard import vertices_for_left_turn, vertices_for_right_turn, GAME_PIECE_COLORS, home_positions, goal_positions, turning_vertices_per_color
 from tools import convert_Vec2D_to_tuple
 
-SPEEDS: list[str] = ["fastest", "fast", "normal", "slow", "slowest"]
-
 
 class GamePiece:
     """This class represents one game piece in the game of a player
@@ -11,20 +9,23 @@ class GamePiece:
     Attributes:
         turtle (Turtle): the turtle of a game piece
         color (str): the color of the game piece
+        home_position (tuple[int | float]): home position of this game piece
+        steps (int): steps the game piece has made
 
     Methods:
         __init__(self, color: str, *, speed: str = "fastest") -> None
         __bool__(self) -> bool
         __repr__(self) -> str
-        move(self, steps: int)
+        move(self, steps: int) -> GamePiece
         get_future_pos(self, steps: int) -> tuple[int | float]
         is_on_field(self) -> bool
         is_in_goal(self) -> bool
         where_in_goal_index(self) -> int
-        get_pos(self) -> tuple
+        get_pos(self) -> tuple[int | float]
     """
 
     def __init__(self, color: str, home_position: tuple[int | float], *, speed: str = "fastest") -> None:
+        """Initialzing attributes and setting up turtle"""
         self.turtle = Turtle()
         self.color: str = color
         self.home_position = home_position
@@ -98,16 +99,21 @@ class GamePiece:
         return self.get_pos() not in home_positions
 
     def is_in_goal(self) -> bool:
-        """
+        """Check method if game piece is in goal
+
         Returns:
-            bool:
+            bool: true if game piece is somewhere in the goal positions
         """
         return self.get_pos() in goal_positions
 
     def where_in_goal_index(self) -> int:
-        """
+        """Getting the goal position of a game piece per index
+
+        Zero is the most inner position
+        Three the most outer position
+
         Returns:
-            int:
+            int: the index of the goal position
         """
         if self.is_in_goal():
             for idx, coord in enumerate(goal_positions[self.color]):
@@ -115,6 +121,8 @@ class GamePiece:
                     return idx
 
     def reset(self):
+        """Resets a game piece, if it got kicked out"""
+        self.steps = 0
         self.turtle.goto(self.home_position)
 
     def get_pos(self) -> tuple[int | float]:

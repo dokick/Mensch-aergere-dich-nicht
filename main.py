@@ -44,7 +44,7 @@ def did_player_hit_other_players(*, game_piece_being_checked: GamePiece, players
         players (list[Player]): information of all players
 
     Returns:
-        GamePiece: Returns the game piece that got hit by another player
+        GamePiece | None: Returns the game piece that got hit by another player or None if no one got hit
     """
     for player in players:
         if player.color == game_piece_being_checked.color:
@@ -99,7 +99,6 @@ def has_player_at_least_one_game_piece_on_game_board(current_player: Player) -> 
 
     Args:
         current_player (Player): the player that has the current turn
-        players (list[Player]): information of all players
 
     Returns:
         bool: true if at least one game piece of the color is on the board
