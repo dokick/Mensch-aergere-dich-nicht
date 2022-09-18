@@ -2,7 +2,7 @@ from turtle import exitonclick
 from random import choice
 from player import Player
 from gamePiece import GamePiece
-from gameBoard import game_board, HOME_ANGLES, COLORS, home_positions, target_positions, enough_vertices_per_color
+from gameBoard import game_board, HOME_ANGLES, COLORS, home_positions, goal_positions
 from tools import dice
 
 """
@@ -75,9 +75,9 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
             current_player.move(dice())
             return
 
-    steps = dice()
-    if current_player.validate_moves(steps=steps, players=players):
-        current_player.move(steps)
+    current_player.move(dice())
+
+
 ######################################## End of game mechanics ########################################
 
 ######################################## Start of helper functions ########################################
@@ -92,7 +92,7 @@ def is_game_piece_in_goal(game_piece_being_checked: GamePiece) -> bool:
     Returns:
         bool: true if the game piece that made a move is already in one of the goal positions
     """
-    return game_piece_being_checked in target_positions
+    return game_piece_being_checked in goal_positions
 
 
 def has_player_at_least_one_game_piece_on_game_board(current_player: Player) -> bool:
@@ -123,9 +123,10 @@ def has_one_player_won(players: list[Player]) -> Player | None:
     # TODO: more deep check necessary if a player has actually won
     for player in players:
         for game_piece in player.game_pieces:
-            if game_piece.get_pos() not in target_positions[player.color]:
+            if game_piece.get_pos() not in goal_positions[player.color]:
                 return None
         return player
+
 
 ######################################## End of helper functions ########################################
 
@@ -144,8 +145,8 @@ def setup(amount_of_players=4) -> tuple[list[Player], Player]:
     """
     players: list[Player] = []
     for color in COLORS:
-        players.append(Player(color=color, game_pieces=[GamePiece(
-            color=color, id=i+1, speed="fastest") for i in range(4)]))
+        players.append(Player(color=color, game_pieces=[
+                       GamePiece(color) for i in range(4)]))
 
     for player in players:
         for idx, game_piece in enumerate(player.game_pieces):
@@ -175,7 +176,7 @@ def start_game_loop(amount_of_players=4):
         make_a_move(current_player=current_player, players=players)
         index_of_current_player += 1
         current_player = players[(index_of_current_player+1) % 4]
-        break  # TODO: This will be deleted in the future
+        break  # TODO: This will be deleted in the future, for testing a endless loop shouldnt happen
 
 ######################################## End of start & game loop ########################################
 
