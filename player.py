@@ -6,8 +6,9 @@ class Player:
     """A player
 
     Attributes:
-        color (str): the color of the player
+        color (str): color of the player
         game_pieces (list[GamePiece]): all game pieces of the same color assigned to a player
+        occupied (dict[tuple[int | float], bool]): dict of the goal positions with a marker, true means occupied
 
     Methods:
         __init__(self, *, color: str, game_pieces: list[GamePiece]) -> None
@@ -22,13 +23,15 @@ class Player:
         """Initializing attributes"""
         self.color = color
         self.game_pieces = game_pieces
+        self.occupied: dict[tuple[int | float], bool] = {
+            pos: False for pos in goal_positions[self.color]}
 
     def __bool__(self) -> bool:
         """Existence of a player should be treated as True"""
         return True
 
     def __repr__(self) -> str:
-        return f"{self.color =}\n {self.game_pieces = }"
+        return f"{self.color =}\n{self.game_pieces = }\n{self.occupied = }"
 
     def get_valid_game_pieces(self, steps: int) -> list[GamePiece]:
         """Validates all potential moves that the player has
@@ -48,12 +51,13 @@ class Player:
         Returns:
             list[GamePiece]: list of all game pieces that qualify for a valid move, if empty player has no valid moves
         """
-        # TODO: Implementation if a game piece is done
         potential_game_pieces: list[GamePiece] = []
 
         for game_piece in self.game_pieces:
             if game_piece.get_pos() not in goal_positions[self.color] or game_piece.get_pos() not in enough_vertices_per_color[self.color]:
                 potential_game_pieces.append(game_piece)
+            if game_piece.is_done(self.occupied):
+                continue
 
             if game_piece.get_pos() == goal_positions[self.color][1] and steps > 1:
                 continue
@@ -86,7 +90,7 @@ class Player:
             steps (int): amount of steps the game piece goes
 
         Returns:
-            GamePiece: the game piece that gets finally picked for the move
+            GamePiece | None: the game piece that gets finally picked for the move or None if no game pieces are available
         """
         game_pieces = self.get_valid_game_pieces(steps)
         if not game_pieces:
@@ -103,16 +107,38 @@ class Player:
                 pick = game_piece
         return pick
 
-    def move(self, steps: int) -> GamePiece:
+    def move(self, steps: int) -> GamePiece | None:
         """Makes the move for a player
 
         Args:
             steps (int): amount of steps the game piece goes
+
+        Returns:
+            GamePiece | None: the game piece that got the move, used to handle rules of the game or None if no game pieces are available
         """
         current_game_piece = self.pick_game_piece(steps)
         if not current_game_piece:
             return
-        return current_game_piece.move(steps)
+        current_game_piece = current_game_piece.move(steps)
+
+        if current_game_piece.is_in_goal():
+            for game_piece in self.game_pieces:
+                if not game_piece.is_in_goal():
+                    continue
+                gp_pos = game_piece.get_pos()
+                for pos, flag in self.occupied.items():
+                    if not flag:
+                        idx = goal_positions[self.color].index(gp_pos)
+                        if idx == 0:
+                            self.occupied[pos] = True
+                        elif idx == 1:
+                            self.occupied[pos] = True
+                        elif idx == 2:
+                            self.occupied[pos] = True
+                        elif idx == 3:
+                            self.occupied[pos] = True
+            # TODO: For-Loops vlt tauschen
+        return current_game_piece
 
 
 def main():
@@ -122,6 +148,7 @@ def main():
     print(player)
     print(bool(player))  # True
     print(not player)  # False
+    player.move(3)
 
 
 if __name__ == "__main__":

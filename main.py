@@ -2,17 +2,17 @@ from turtle import exitonclick
 from random import choice
 from player import Player
 from gamePiece import GamePiece
-from gameBoard import game_board, HOME_ANGLES, COLORS, home_positions, goal_positions
+from gameBoard import game_board, draw_winner_on_board, HOME_ANGLES, COLORS, home_positions, goal_positions
 from tools import dice
 
 """
 Behaviour of players:
 
--   First priority is it to get the furthest game piece into one of the final positions,
-    no matter the risks or tactical advantages for other game pieces
--   If the player rolls a 1, 2 or 3 with the dice the player will use that on game pieces
-    that aren't all the way deep in the final positions,
-    if there's no tactical disadvantage for other game pieces
+- First priority is it to get the furthest game piece into one of the final positions,
+  no matter the risks or tactical advantages for other game pieces
+- If the player rolls a 1, 2 or 3 with the dice the player will use that on game pieces
+  that aren't all the way deep in the final positions,
+  if there's no tactical disadvantage for other game pieces
 
 Rules:
 
@@ -133,6 +133,10 @@ def has_one_player_won(players: list[Player]) -> Player | None:
 ######################################## Start of setup & game loop ########################################
 
 
+def draw_winner(player: Player):
+    draw_winner_on_board(player.color)
+
+
 def setup(amount_of_players=4) -> tuple[list[Player], Player]:
     # TODO: setup() abhängig von der Anzahl an Spielern machen die spielen
     """A setup function so the game can start with initial values
@@ -141,7 +145,7 @@ def setup(amount_of_players=4) -> tuple[list[Player], Player]:
         amount_of_players (int): the amount of players in the game (not implemented yet)
 
     Returns:
-        tuple: first a dict with all the players, second the color that starts the game
+        tuple: first a tuple with all the players, second the player that starts the game
     """
     players: list[Player] = []
     for color in COLORS:
@@ -164,24 +168,32 @@ def start_game_loop(amount_of_players=4):
     Loop works as follows:
     - move the current player (validation and handling happens in move or in subfunctions of move)
     - set the next player for the next iteration
+    - check if someone has won yet
 
     Args:
         amount_of_players (int): the amount of players that are playing (not implemented yet)
     """
     players, current_player = setup(amount_of_players)
     index_of_current_player = players.index(current_player)
+    won_player = None
+    iterations = 0
 
-    while not has_one_player_won(players):
+    while not won_player:
         make_a_move(current_player=current_player, players=players)
         index_of_current_player += 1
         current_player = players[(index_of_current_player+1) % 4]
-        break  # TODO: This will be deleted in the future, for testing a endless loop shouldnt happen
+        won_player = has_one_player_won(players)
+        iterations += 1
+        if iterations == 5:
+            break
+    print(f"{won_player} has won the game")
+    draw_winner(won_player)
 
 ######################################## End of start & game loop ########################################
 
 
 def main():
-    game_board()
+    # game_board()
     start_game_loop()
     exitonclick()
 
