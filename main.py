@@ -80,7 +80,7 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
     if not has_player_at_least_one_game_piece_on_game_board(current_player) and permission():
         current_player.set_game_piece_to_start()
 
-    current_game_piece = current_player.move(1)  # ! 6 should be dice()
+    current_game_piece = current_player.move(dice())  # ! 6 should be dice()
 
     if current_game_piece:
         kicked_out_game_piece = did_player_hit_other_players(
@@ -149,8 +149,8 @@ def setup(amount_of_players=4) -> tuple[list[Player], Player]:
     """
     players: list[Player] = []
     for color in COLORS:
-        players.append(Player(color=color, game_pieces=[
-            GamePiece(color, home_positions[color][i], speed='normal') for i in range(4)]))
+        players.append(Player(color=color, game_pieces=[GamePiece(
+            color, home_positions[color][i], speed=4) for i in range(4)]))
 
     for player, color in zip(players, COLORS):
         for game_piece in player.game_pieces:
@@ -184,8 +184,7 @@ def start_game_loop(amount_of_players=4):
         current_player = players[(index_of_current_player+1) % 4]
         won_player = has_one_player_won(players)
         iterations += 1
-        print(iterations)
-        if iterations == 100:
+        if iterations == 70:
             break
     print(f"{won_player} has won the game")
     # draw_winner(won_player)

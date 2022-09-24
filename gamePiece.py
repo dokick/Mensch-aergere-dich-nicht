@@ -13,7 +13,7 @@ class GamePiece:
         steps (int): steps the game piece has made
 
     Methods:
-        __init__(self, color: str, home_position: tuple[float], *, speed: str = "fastest") -> None
+        __init__(self, color: str, home_position: tuple[float], *, speed: int = 0) -> None
         __bool__(self) -> bool
         __repr__(self) -> str
         move(self, steps: int) -> GamePiece
@@ -27,7 +27,7 @@ class GamePiece:
         where_in_goal_index(self) -> int
     """
 
-    def __init__(self, color: str, home_position: tuple[float], *, speed: str = "fastest") -> None:
+    def __init__(self, color: str, home_position: tuple[float], *, speed: int = 0) -> None:
         """Initialzing attributes and setting up turtle"""
         self.turtle = Turtle()
         self.color: str = color
@@ -38,7 +38,7 @@ class GamePiece:
         screen.colormode(255)
         self.turtle.fillcolor(GAME_PIECE_COLORS[self.color])
         self.turtle.pencolor(255, 255, 255)
-        self.turtle.speed(speed=speed)
+        self.turtle.speed(speed)
         self.turtle.shape("turtle")
         self.turtle.penup()
 
