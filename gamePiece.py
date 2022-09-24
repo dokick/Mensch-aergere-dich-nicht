@@ -37,6 +37,7 @@ class GamePiece:
         screen = Screen()
         screen.colormode(255)
         self.turtle.fillcolor(GAME_PIECE_COLORS[self.color])
+        self.turtle.pencolor(0, 0, 0)
         self.turtle.speed(speed=speed)
         self.turtle.shape("turtle")
         self.turtle.penup()
