@@ -11,7 +11,7 @@ def dice() -> int:
     return randint(1, 6)
 
 
-def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[int | float]:
+def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float]:
     """Converting a Vec2D Vector from turtle
 
     Used for getting the position of a turtle and not worry about compatibility issues
@@ -23,7 +23,7 @@ def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[int | float]:
     Returns:
         tuple: turtle's position (x, y)
     """
-    return (pos[0], pos[1])
+    return tuple(pos)
 
 
 if __name__ == "__main__":
