@@ -185,7 +185,7 @@ def start_game_loop(amount_of_players=4):
         won_player = has_one_player_won(players)
         iterations += 1
         print(iterations)
-        if iterations == 50:
+        if iterations == 100:
             break
     print(f"{won_player} has won the game")
     # draw_winner(won_player)

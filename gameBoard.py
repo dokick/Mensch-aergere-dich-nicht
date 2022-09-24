@@ -9,27 +9,27 @@ GAME_PIECE_COLORS: dict[str, tuple[int]] = {"yellow": (255, 215, 0), "green": (
 
 # TODO: Docs of what those data structures do, renaming those which are const
 """All x and y positions of the vertices where a game piece has to turn"""
-vertices: tuple[tuple[int | float]] = ((-80, -400), (-80, -80), (-400, -80), (-400, 80), (-80, 80),
-                                       (-80, 400), (80, 400), (80, 80), (400, 80), (400, -80), (80, -80), (80, -400))
+vertices: tuple[tuple[float]] = ((-80.00, -400.00), (-80.00, -80.00), (-400.00, -80.00), (-400.00, 80.00), (-80.00, 80.00),
+                                 (-80.00, 400.00), (80.00, 400.00), (80.00, 80.00), (400.00, 80.00), (400.00, -80.00), (80.00, -80.00), (80.00, -400.00))
 
 # vertices_for_left_turn = tuple([(i*STEP_SIZE, j*STEP_SIZE) for i, j in zip((-1, -1, 1, 1), (-1, 1, 1, -1))])
-vertices_for_left_turn: tuple[tuple[int | float]] = (
-    (-80, -80), (-80, 80), (80, 80), (80, -80))
+vertices_for_left_turn: tuple[tuple[float]] = (
+    (-80.00, -80.00), (-80.00, 80.00), (80.00, 80.00), (80.00, -80.00))
 
-vertices_for_right_turn: tuple[tuple[int | float]] = (
-    (-80, -400), (-400, -80), (-400, 80), (-80, 400), (80, 400), (400, 80), (400, -80), (80, -400))
+vertices_for_right_turn: tuple[tuple[float]] = ((-80.00, -400.00), (-400.00, -80.00), (-400.00, 80.00),
+                                                (-80.00, 400.00), (80.00, 400.00), (400.00, 80.00), (400.00, -80.00), (80.00, -400.00))
 
-starting_vertices: dict[str, tuple[int | float]] = {
-    "yellow": (-400, 80), "green": (80, 400), "red": (400, -80), "black": (-80, -400)}
+starting_vertices: dict[str, tuple[float]] = {"yellow": (-400.00, 80.00), "green": (
+    80.00, 400.00), "red": (400.00, -80.00), "black": (-80.00, -400.00)}
 
 """Coordinates of the vertices where game pieces of certain colors need to turn,
 so they don't travel in an endless loop on the game board"""
 # turning_vertices_per_color = {color: pos for color, pos in zip(COLORS, ((-STEP_SIZE*5, 0), (0, STEP_SIZE*5), (STEP_SIZE*5, 0), (0, -STEP_SIZE*5)))}
-turning_vertices_per_color: dict[str, tuple[int | float]] = {
-    "yellow": (-400, 0), "green": (0, 400), "red": (400, 0), "black": (0, -400)}
+turning_vertices_per_color: dict[str, tuple[float]] = {
+    "yellow": (-400.00, 0.00), "green": (0.00, 400.00), "red": (400.00, 0.00), "black": (0.00, -400.00)}
 
-enough_vertices_per_color: dict[str, tuple[tuple[int | float]]] = {"yellow": ((-400, 0), (-400, -80)), "green": (
-    (0, 400), (-80, 400)), "red": ((400, 0), (400, 80)), "black": ((0, -400), (80, -400))}
+enough_vertices_per_color: dict[str, tuple[tuple[float]]] = {"yellow": ((-400.00, 0.00), (-400.00, -80.00)), "green": (
+    (0.00, 400.00), (-80.00, 400.00)), "red": ((400.00, 0.00), (400.00, 80.00)), "black": ((0.00, -400.00), (80.00, -400.00))}
 
 """All goal positions per color in a dictionary"""
 yellow_goal_fields = tuple([(-STEP_SIZE*(i+1), 0) for i in range(4)])
@@ -39,11 +39,16 @@ black_goal_fields = tuple([(STEP_SIZE*(i+1), 0) for i in range(4)])
 goal_positions = {color: pos for color, pos in zip(
     COLORS, (yellow_goal_fields, green_goal_fields, red_goal_fields, black_goal_fields))}
 
-# goal_positions: dict[str, tuple[tuple[int]]] = {"yellow": ((-80, 0), (-160, 0), (-240, 0), (-320, 0)), "green": ((0, 80), (0, 160), (0, 240), (0, 320)), "red": ((80, 0), (160, 0), (240, 0), (320, 0)), "black": ((0, -80), (0, -160), (0, -240), (0, -320))}
+# goal_positions: dict[str, tuple[tuple[int]]] = {"yellow": ((-80, 0), (-160, 0), (-240, 0), (-320, 0)),
+#                                                 "green": ((0, 80), (0, 160), (0, 240), (0, 320)),
+#                                                 "red": ((80, 0), (160, 0), (240, 0), (320, 0)),
+#                                                 "black": ((0, -80), (0, -160), (0, -240), (0, -320))}
 
 """All home positions per color in a dictionary"""
-home_positions: dict[str, tuple[tuple[int | float]]] = {"yellow": ((-390, 390), (-320, 390), (-390, 320), (-320, 320)), "green": ((320, 390), (390, 390), (320, 320), (390, 320)),
-                                                        "red": ((320, -320), (390, -320), (320, -390), (390, -390)), "black": ((-390, -320), (-320, -320), (-390, -390), (-320, -390))}
+home_positions: dict[str, tuple[tuple[float]]] = {"yellow": ((-390.00, 390.00), (-320.00, 390.00), (-390.00, 320.00), (-320.00, 320.00)),
+                                                "green": ((320.00, 390), (390.00, 390.00), (320.00, 320.00), (390.00, 320.00)),
+                                                "red": ((320.00, -320.00), (390.00, -320.00), (320.00, -390.00), (390.00, -390.00)),
+                                                "black": ((-390.00, -320.00), (-320.00, -320.00), (-390.00, -390.00), (-320.00, -390.00))}
 
 """All starting angles for the colors so starting them and setting them up for the start of the game becomes easier"""
 # HOME_ANGLES = {color: angle for color, angle in zip(COLORS, (90, 0, 270, 180))}

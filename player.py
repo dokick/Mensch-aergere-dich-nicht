@@ -8,7 +8,7 @@ class Player:
     Attributes:
         color (str): color of the player
         game_pieces (list[GamePiece]): all game pieces of the same color assigned to a player
-        occupied (dict[tuple[int | float], bool]): dict of the goal positions with a marker, true means occupied
+        occupied (dict[tuple[float], bool]): dict of the goal positions with a marker, true means occupied
 
     Methods:
         __init__(self, *, color: str, game_pieces: list[GamePiece]) -> None
@@ -24,7 +24,7 @@ class Player:
         """Initializing attributes"""
         self.color = color
         self.game_pieces = game_pieces
-        self.occupied: dict[tuple[int | float], bool] = {
+        self.occupied: dict[tuple[float], bool] = {
             pos: False for pos in goal_positions[self.color]}
 
     def __bool__(self) -> bool:

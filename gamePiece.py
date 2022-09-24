@@ -9,25 +9,25 @@ class GamePiece:
     Attributes:
         turtle (Turtle): the turtle of a game piece
         color (str): the color of the game piece
-        home_position (tuple[int | float]): home position of this game piece
+        home_position (tuple[float]): home position of this game piece
         steps (int): steps the game piece has made
 
     Methods:
-        __init__(self, color: str, home_position: tuple[int | float], *, speed: str = "fastest") -> None
+        __init__(self, color: str, home_position: tuple[float], *, speed: str = "fastest") -> None
         __bool__(self) -> bool
         __repr__(self) -> str
         move(self, steps: int) -> GamePiece
         get_out(self) -> GamePiece
-        get_future_pos(self, steps: int) -> tuple[int | float]
+        reset(self) -> GamePiece
+        get_future_pos(self, steps: int) -> tuple[float]
+        get_pos(self) -> tuple[float]
         is_on_field(self) -> bool
-        is_done(self, occupied_goal_fields: dict[tuple[int | float], bool]) -> bool
+        is_done(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool
         is_in_goal(self) -> bool
         where_in_goal_index(self) -> int
-        reset(self) -> GamePiece
-        get_pos(self) -> tuple[int | float]
     """
 
-    def __init__(self, color: str, home_position: tuple[int | float], *, speed: str = "fastest") -> None:
+    def __init__(self, color: str, home_position: tuple[float], *, speed: str = "fastest") -> None:
         """Initialzing attributes and setting up turtle"""
         self.turtle = Turtle()
         self.color: str = color
@@ -76,14 +76,24 @@ class GamePiece:
         self.turtle.goto(starting_vertices[self.color])
         return self
 
-    def get_future_pos(self, steps: int) -> tuple[int | float]:
+    def reset(self):
+        """Resets a game piece, if it got kicked out
+
+        Returns:
+            GamePiece: self
+        """
+        self.steps = 0
+        self.turtle.goto(self.home_position)
+        return self
+
+    def get_future_pos(self, steps: int) -> tuple[float]:
         """Method for calculating the furure position of the game piece's turtle
 
         Args:
             steps (int): amount of steps the game piece goes
 
         Returns:
-            tuple[int | float]: future position of the turtle 
+            tuple[float]: future position of the turtle 
         """
         future_pos = list(self.get_pos())
         future_heading = self.turtle.heading()
@@ -101,7 +111,15 @@ class GamePiece:
                 future_pos[0] -= 80  # x-
             elif future_heading == 270:
                 future_pos[1] -= 80  # y-
-        return (future_pos[0], future_pos[1])
+        return tuple(future_pos)
+
+    def get_pos(self) -> tuple[float]:
+        """Getter for the turtle's position
+
+        Returns:
+            tuple: turtle's position (x, y)
+        """
+        return convert_Vec2D_to_tuple(self.turtle.pos())
 
     def is_on_field(self) -> bool:
         """Returns if a game piece is on the field
@@ -114,14 +132,14 @@ class GamePiece:
         """
         return self.get_pos() not in home_positions[self.color]
 
-    def is_done(self, occupied_goal_fields: dict[tuple[int | float], bool]) -> bool:
+    def is_done(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool:
         """Returns if a game piece shouldn't move anymore
 
         A goal field is occupied when all the ongoing goal fields are occupied
         and a game piece is on it that shouldn't move anymore
 
         Args:
-            occupied_goal_fields (dict[tuple[int | float], bool]): dict of the goal fields and if they are occupied
+            occupied_goal_fields (dict[tuple[float], bool]): dict of the goal fields and if they are occupied
 
         Returns:
             bool: true if the game piece shouldn't move anymore
@@ -152,24 +170,6 @@ class GamePiece:
                 if coord == self.get_pos():
                     return idx
         return -1
-
-    def reset(self):
-        """Resets a game piece, if it got kicked out
-
-        Returns:
-            GamePiece: self
-        """
-        self.steps = 0
-        self.turtle.goto(self.home_position)
-        return self
-
-    def get_pos(self) -> tuple[int | float]:
-        """Getter for the turtle's position
-
-        Returns:
-            tuple: turtle's position (x, y)
-        """
-        return convert_Vec2D_to_tuple(self.turtle.pos())
 
 
 def main():
