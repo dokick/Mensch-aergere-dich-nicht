@@ -1,5 +1,5 @@
 from turtle import Screen, Turtle, forward, pos, left, right, exitonclick
-from gameBoard import GAME_PIECE_COLORS, home_positions, goal_positions, starting_vertices, vertices_for_left_turn, vertices_for_right_turn, turning_vertices_per_color
+from gameBoard import GAME_PIECE_COLORS, HOME_ANGLES, home_positions, goal_positions, starting_vertices, vertices_for_left_turn, vertices_for_right_turn, turning_vertices_per_color
 from tools import convert_Vec2D_to_tuple
 
 
@@ -84,6 +84,7 @@ class GamePiece:
         """
         self.steps = 0
         self.turtle.goto(self.home_position)
+        self.turtle.seth(HOME_ANGLES[self.color])
         return self
 
     def get_future_pos(self, steps: int) -> tuple[float]:

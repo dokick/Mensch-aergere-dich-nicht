@@ -15,7 +15,7 @@ def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float]:
     """Converting a Vec2D Vector from turtle
 
     Used for getting the position of a turtle and not worry about compatibility issues
-    It is maybe theoretically possible to get a not intended output, because we are dealing with a 2D plane and just interested in the two first elements
+    We are rounding to the last 2 digits, because the turtle GUI can scramble up numbers
 
     Args:
         pos (Vec2D): turtle's position
@@ -23,7 +23,7 @@ def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float]:
     Returns:
         tuple: turtle's position (x, y)
     """
-    return tuple(pos)
+    return tuple([round(i, 2) for i in pos])
 
 
 if __name__ == "__main__":
