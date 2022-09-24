@@ -17,6 +17,7 @@ class Player:
         get_valid_game_pieces(self, steps: int) -> list[GamePiece]
         pick_game_piece(self, steps: int) -> GamePiece
         move(self, steps: int) -> None
+        set_game_piece_to_start(self) -> None
     """
 
     def __init__(self, *, color: str, game_pieces: list[GamePiece]) -> None:
@@ -139,6 +140,14 @@ class Player:
                             self.occupied[pos] = True
             # TODO: For-Loops vlt tauschen
         return current_game_piece
+
+    def set_game_piece_to_start(self) -> None:
+        """Puts a game piece of the corresponding color on the starting vertex"""
+        game_pieces_at_home: list[GamePiece] = []
+        for game_piece in self.game_pieces:
+            if not game_piece.is_on_field():
+                game_pieces_at_home.append(game_piece)
+        game_pieces_at_home[0].get_out()
 
 
 def main():

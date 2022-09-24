@@ -1,5 +1,5 @@
 from turtle import Screen, Turtle, forward, pos, left, right, exitonclick
-from gameBoard import vertices_for_left_turn, vertices_for_right_turn, GAME_PIECE_COLORS, home_positions, goal_positions, turning_vertices_per_color
+from gameBoard import GAME_PIECE_COLORS, home_positions, goal_positions, starting_vertices, vertices_for_left_turn, vertices_for_right_turn, turning_vertices_per_color
 from tools import convert_Vec2D_to_tuple
 
 
@@ -17,6 +17,7 @@ class GamePiece:
         __bool__(self) -> bool
         __repr__(self) -> str
         move(self, steps: int) -> GamePiece
+        get_out(self) -> GamePiece
         get_future_pos(self, steps: int) -> tuple[int | float]
         is_on_field(self) -> bool
         is_done(self, occupied_goal_fields: dict[tuple[int | float], bool]) -> bool
@@ -63,6 +64,15 @@ class GamePiece:
                 self.turtle.right(90)
             self.turtle.forward(80)
             self.steps += 1
+        return self
+
+    def get_out(self):
+        """Puts the game piece on it's starting position
+
+        Returns:
+            GamePiece: self
+        """
+        self.turtle.goto(starting_vertices[self.color])
         return self
 
     def get_future_pos(self, steps: int) -> tuple[int | float]:
@@ -115,7 +125,10 @@ class GamePiece:
         Returns:
             bool: true if the game piece shouldn't move anymore
         """
-        return occupied_goal_fields[self.get_pos()]
+        if self.get_pos() in occupied_goal_fields.keys():
+            return occupied_goal_fields[self.get_pos()]
+        return False
+
 
     def is_in_goal(self) -> bool:
         """Check method if game piece is in goal

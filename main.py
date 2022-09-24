@@ -77,16 +77,16 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
         current_player (Player): the player that has the current turn
         players (list[Player]): information of all players
     """
-    if not has_player_at_least_one_game_piece_on_game_board(current_player):
-        if permission():
-            current_player.move(dice())
-            return
+    if not has_player_at_least_one_game_piece_on_game_board(current_player) and permission():
+        current_player.set_game_piece_to_start()
 
     current_game_piece = current_player.move(dice())
-    kicked_out_game_piece: GamePiece | None = did_player_hit_other_players(
-        current_game_piece, players)
-    if kicked_out_game_piece:
-        kicked_out_game_piece.reset()
+
+    if current_game_piece:
+        kicked_out_game_piece = did_player_hit_other_players(
+            game_piece_being_checked=current_game_piece, players=players)
+        if kicked_out_game_piece:
+            kicked_out_game_piece.reset()
 
 
 ######################################## End of game mechanics ########################################
@@ -95,16 +95,16 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
 
 
 def has_player_at_least_one_game_piece_on_game_board(current_player: Player) -> bool:
-    """Checks if a player has at least one of it's game pieces on the board playing
+    """Checks if a player has at least one of it's game pieces that's playable on the board playing
 
     Args:
         current_player (Player): the player that has the current turn
 
     Returns:
-        bool: true if at least one game piece of the color is on the board
+        bool: true if at least one playable game piece of the color is on the board
     """
     for game_piece in current_player.game_pieces:
-        if game_piece.is_on_field():
+        if game_piece.is_on_field() and not game_piece.is_done(current_player.occupied):
             return True
     return False
 
@@ -184,7 +184,7 @@ def start_game_loop(amount_of_players=4):
         current_player = players[(index_of_current_player+1) % 4]
         won_player = has_one_player_won(players)
         iterations += 1
-        if iterations == 5:
+        if iterations == 100:
             break
     print(f"{won_player} has won the game")
     draw_winner(won_player)
