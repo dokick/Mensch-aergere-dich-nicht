@@ -1,11 +1,13 @@
-from turtle import exitonclick, hideturtle, shape, speed, fillcolor, pencolor, width, penup, pendown, goto, begin_fill, end_fill, seth, circle, left, right, forward, back, write
+from turtle import Turtle, exitonclick, hideturtle, shape, speed, fillcolor, pencolor, width, penup, pendown, goto, begin_fill, end_fill, seth, circle, left, right, forward, back, write
 
 STEP_SIZE: int = 80
 
 """Order of colors beginning in the top left corner and then going clockwise: yellow, green, red, black"""
 COLORS: tuple[str] = ("yellow", "green", "red", "black")
-GAME_PIECE_COLORS: dict[str, tuple[int]] = {"yellow": (255, 215, 0), "green": (
-    15, 200, 11), "red": (176, 0, 0), "black": (64, 64, 64)}
+GAME_PIECE_COLORS: dict[str, tuple[int]] = {"yellow": (255, 215, 0),
+                                            "green": (15, 200, 11),
+                                            "red": (176, 0, 0),
+                                            "black": (64, 64, 64)}
 
 # TODO: Docs of what those data structures do, renaming those which are const
 """All x and y positions of the vertices where a game piece has to turn"""
@@ -19,17 +21,23 @@ vertices_for_left_turn: tuple[tuple[float]] = (
 vertices_for_right_turn: tuple[tuple[float]] = ((-80.00, -400.00), (-400.00, -80.00), (-400.00, 80.00),
                                                 (-80.00, 400.00), (80.00, 400.00), (400.00, 80.00), (400.00, -80.00), (80.00, -400.00))
 
-starting_vertices: dict[str, tuple[float]] = {"yellow": (-400.00, 80.00), "green": (
-    80.00, 400.00), "red": (400.00, -80.00), "black": (-80.00, -400.00)}
+starting_vertices: dict[str, tuple[float]] = {"yellow": (-400.00, 80.00),
+                                              "green": (80.00, 400.00),
+                                              "red": (400.00, -80.00),
+                                              "black": (-80.00, -400.00)}
 
 """Coordinates of the vertices where game pieces of certain colors need to turn,
 so they don't travel in an endless loop on the game board"""
 # turning_vertices_per_color = {color: pos for color, pos in zip(COLORS, ((-STEP_SIZE*5, 0), (0, STEP_SIZE*5), (STEP_SIZE*5, 0), (0, -STEP_SIZE*5)))}
-turning_vertices_per_color: dict[str, tuple[float]] = {
-    "yellow": (-400.00, 0.00), "green": (0.00, 400.00), "red": (400.00, 0.00), "black": (0.00, -400.00)}
+turning_vertices_per_color: dict[str, tuple[float]] = {"yellow": (-400.00, 0.00),
+                                                       "green": (0.00, 400.00),
+                                                       "red": (400.00, 0.00),
+                                                       "black": (0.00, -400.00)}
 
-enough_vertices_per_color: dict[str, tuple[tuple[float]]] = {"yellow": ((-400.00, 0.00), (-400.00, -80.00)), "green": (
-    (0.00, 400.00), (-80.00, 400.00)), "red": ((400.00, 0.00), (400.00, 80.00)), "black": ((0.00, -400.00), (80.00, -400.00))}
+enough_vertices_per_color: dict[str, tuple[tuple[float]]] = {"yellow": ((-400.00, 0.00), (-400.00, -80.00)),
+                                                             "green": ((0.00, 400.00), (-80.00, 400.00)),
+                                                             "red": ((400.00, 0.00), (400.00, 80.00)),
+                                                             "black": ((0.00, -400.00), (80.00, -400.00))}
 
 """All goal positions per color in a dictionary"""
 yellow_goal_fields = tuple([(-STEP_SIZE*(i+1), 0) for i in range(4)])
@@ -39,21 +47,23 @@ black_goal_fields = tuple([(STEP_SIZE*(i+1), 0) for i in range(4)])
 goal_positions = {color: pos for color, pos in zip(
     COLORS, (yellow_goal_fields, green_goal_fields, red_goal_fields, black_goal_fields))}
 
-# goal_positions: dict[str, tuple[tuple[int]]] = {"yellow": ((-80, 0), (-160, 0), (-240, 0), (-320, 0)),
-#                                                 "green": ((0, 80), (0, 160), (0, 240), (0, 320)),
-#                                                 "red": ((80, 0), (160, 0), (240, 0), (320, 0)),
-#                                                 "black": ((0, -80), (0, -160), (0, -240), (0, -320))}
+# goal_positions: dict[str, tuple[tuple[float]]] = {"yellow": ((-80.00, 0.00), (-160.00, 0.00), (-240.00, 0.00), (-320.00, 0.00)),
+#                                                   "green": ((0.00, 80.00), (0.00, 160.00), (0.00, 240.00), (0.00, 320.00)),
+#                                                   "red": ((80.00, 0.00), (160.00, 0.00), (240.00, 0.00), (320.00, 0.00)),
+#                                                   "black": ((0.00, -80.00), (0.00, -160.00), (0.00, -240.00), (0.00, -320.00))}
 
 """All home positions per color in a dictionary"""
 home_positions: dict[str, tuple[tuple[float]]] = {"yellow": ((-390.00, 390.00), (-320.00, 390.00), (-390.00, 320.00), (-320.00, 320.00)),
-                                                "green": ((320.00, 390), (390.00, 390.00), (320.00, 320.00), (390.00, 320.00)),
-                                                "red": ((320.00, -320.00), (390.00, -320.00), (320.00, -390.00), (390.00, -390.00)),
-                                                "black": ((-390.00, -320.00), (-320.00, -320.00), (-390.00, -390.00), (-320.00, -390.00))}
+                                                  "green": ((320.00, 390), (390.00, 390.00), (320.00, 320.00), (390.00, 320.00)),
+                                                  "red": ((320.00, -320.00), (390.00, -320.00), (320.00, -390.00), (390.00, -390.00)),
+                                                  "black": ((-390.00, -320.00), (-320.00, -320.00), (-390.00, -390.00), (-320.00, -390.00))}
 
 """All starting angles for the colors so starting them and setting them up for the start of the game becomes easier"""
 # HOME_ANGLES = {color: angle for color, angle in zip(COLORS, (90, 0, 270, 180))}
 HOME_ANGLES: dict[str, int] = {"yellow": 90,
-                               "green": 0, "red": 270, "black": 180}
+                               "green": 0,
+                               "red": 270,
+                               "black": 180}
 
 
 # TODO: Make game board resizeable and dependent of desired size
@@ -269,9 +279,10 @@ def draw_winner_on_board(color: str):
 
 def main():
     """For testing and debugging purposes"""
-    # game_board()
+    game_board()
     draw_winner_on_board("green")
-    # exitonclick()
+    exitonclick()
+
 
 
 if __name__ == "__main__":
