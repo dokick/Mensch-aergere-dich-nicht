@@ -62,7 +62,7 @@ def permission() -> bool:
         bool: true if the dice got a 6 in three throws
     """
     for i in range(3):
-        if dice() == 6:
+        if 6 == 6:  # ! First 6 should be dice()
             return True
     return False
 
@@ -80,7 +80,7 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
     if not has_player_at_least_one_game_piece_on_game_board(current_player) and permission():
         current_player.set_game_piece_to_start()
 
-    current_game_piece = current_player.move(dice())
+    current_game_piece = current_player.move(1)  # ! 6 should be dice()
 
     if current_game_piece:
         kicked_out_game_piece = did_player_hit_other_players(
@@ -150,9 +150,9 @@ def setup(amount_of_players=4) -> tuple[list[Player], Player]:
     players: list[Player] = []
     for color in COLORS:
         players.append(Player(color=color, game_pieces=[
-            GamePiece(color, home_positions[color][i]) for i in range(4)]))
+            GamePiece(color, home_positions[color][i], speed='normal') for i in range(4)]))
 
-    for player in players:
+    for player, color in zip(players, COLORS):
         for game_piece in player.game_pieces:
             game_piece.turtle.seth(HOME_ANGLES[color])
             game_piece.turtle.goto(game_piece.home_position)
@@ -184,16 +184,17 @@ def start_game_loop(amount_of_players=4):
         current_player = players[(index_of_current_player+1) % 4]
         won_player = has_one_player_won(players)
         iterations += 1
-        if iterations == 100:
+        print(iterations)
+        if iterations == 50:
             break
     print(f"{won_player} has won the game")
-    draw_winner(won_player)
+    # draw_winner(won_player)
 
 ######################################## End of start & game loop ########################################
 
 
 def main():
-    # game_board()
+    game_board()
     start_game_loop()
     exitonclick()
 
