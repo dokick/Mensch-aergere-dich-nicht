@@ -37,7 +37,7 @@ class GamePiece:
         screen = Screen()
         screen.colormode(255)
         self.turtle.fillcolor(GAME_PIECE_COLORS[self.color])
-        self.turtle.pencolor(0, 0, 0)
+        self.turtle.pencolor(255, 255, 255)
         self.turtle.speed(speed=speed)
         self.turtle.shape("turtle")
         self.turtle.penup()
@@ -129,7 +129,6 @@ class GamePiece:
         if self.get_pos() in occupied_goal_fields.keys():
             return occupied_goal_fields[self.get_pos()]
         return False
-
 
     def is_in_goal(self) -> bool:
         """Check method if game piece is in goal

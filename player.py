@@ -80,7 +80,7 @@ class Player:
                 if game_piece.get_future_pos(steps) == other_game_piece.get_pos():
                     continue
                 final_game_pieces.append(game_piece)
-        
+
         return final_game_pieces
 
     def pick_game_piece(self, steps: int) -> GamePiece | None:
