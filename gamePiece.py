@@ -151,6 +151,7 @@ class GamePiece:
             for idx, coord in enumerate(goal_positions[self.color]):
                 if coord == self.get_pos():
                     return idx
+        return -1
 
     def reset(self):
         """Resets a game piece, if it got kicked out

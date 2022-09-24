@@ -22,7 +22,8 @@ vertices_for_right_turn: tuple[tuple[int]] = (
 starting_vertices: dict[str, tuple[int]] = {
     "yellow": (-400, 80), "green": (80, 400), "red": (400, -80), "black": (-80, -400)}
 
-"""Coordinates of the vertices where game pieces of certain colors need to turn so they dont travel in an endless loop on the game board"""
+"""Coordinates of the vertices where game pieces of certain colors need to turn,
+so they don't travel in an endless loop on the game board"""
 turning_vertices_per_color = {color: pos for color, pos in zip(
     COLORS, ((-STEP_SIZE*5, 0), (0, STEP_SIZE*5), (STEP_SIZE*5, 0), (0, -STEP_SIZE*5)))}
 # turning_vertices_per_color: dict[str, tuple[int]] = {"yellow": (-400, 0), "green": (0, 400), "red": (400, 0), "black": (0, -400)}
@@ -40,7 +41,7 @@ goal_positions = {color: pos for color, pos in zip(
 
 # goal_positions: dict[str, tuple[tuple[int]]] = {"yellow": ((-80, 0), (-160, 0), (-240, 0), (-320, 0)), "green": ((0, 80), (0, 160), (0, 240), (0, 320)), "red": ((80, 0), (160, 0), (240, 0), (320, 0)), "black": ((0, -80), (0, -160), (0, -240), (0, -320))}
 
-"""All starting positions per color in a dictionary"""
+"""All home positions per color in a dictionary"""
 home_positions: dict[str, tuple[tuple[int]]] = {"yellow": ((-390, 390), (-320, 390), (-390, 320), (-320, 320)), "green": ((320, 390), (390, 390), (320, 320), (390, 320)),
                                                 "red": ((320, -320), (390, -320), (320, -390), (390, -390)), "black": ((-390, -320), (-320, -320), (-390, -390), (-320, -390))}
 

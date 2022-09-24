@@ -53,7 +53,6 @@ class Player:
             list[GamePiece]: list of all game pieces that qualify for a valid move, if empty player has no valid moves
         """
         potential_game_pieces: list[GamePiece] = []
-
         for game_piece in self.game_pieces:
             if game_piece.get_pos() not in goal_positions[self.color] or game_piece.get_pos() not in enough_vertices_per_color[self.color]:
                 potential_game_pieces.append(game_piece)
@@ -81,6 +80,8 @@ class Player:
                 if game_piece.get_future_pos(steps) == other_game_piece.get_pos():
                     continue
                 final_game_pieces.append(game_piece)
+        
+        return final_game_pieces
 
     def pick_game_piece(self, steps: int) -> GamePiece | None:
         """Gets all the valid game pieces and picks a final game piece
