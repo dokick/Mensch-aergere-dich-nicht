@@ -31,6 +31,13 @@ Not Yet Implemented Features:
 - When a player rolls a 6, but his game pieces can't move, a new game piece will come out
 - Rolling a 6 leads to making a move again
 - Deep check for when a player has won
+- Less than 4 players and user playing with them
+
+TODO:
+- Spielfiguren können das Ziel überspringen
+- Spielfiguren derselben Farbe übereinander im Ziel
+- Wenn eine Spielfigur durch rauskommen eine andere Farbe rausschmeißen müsste, passiert es nicht
+- Priorität, dass bei geringer Würfelzahl die Spielfiguren im Ziel benutzt werden, funktioniert nicht
 """
 
 ######################################## Start of game mechanics ########################################
@@ -55,14 +62,14 @@ def did_player_hit_other_players(*, game_piece_being_checked: GamePiece, players
     return None
 
 
-def permission() -> bool:
+def get_permission() -> bool:
     """Gives a game piece the permission to leave home and get on field
 
     Returns:
         bool: true if the dice got a 6 in three throws
     """
-    for i in range(3):
-        if 6 == 6:  # ! First 6 should be dice()
+    for _ in range(3):
+        if dice() == 6:
             return True
     return False
 
@@ -77,16 +84,21 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
         current_player (Player): the player that has the current turn
         players (list[Player]): information of all players
     """
-    if not has_player_at_least_one_game_piece_on_game_board(current_player) and permission():
-        current_player.set_game_piece_to_start()
+    permission = False
+    has_gp_on_board = has_player_at_least_one_game_piece_on_game_board(current_player)
+    if not has_gp_on_board:
+        permission = get_permission()
+        if permission:
+            current_player.set_game_piece_to_start()
 
-    current_game_piece = current_player.move(dice())  # ! 6 should be dice()
+    if has_gp_on_board or permission:
+        current_game_piece = current_player.move(dice())
 
-    if current_game_piece:
-        kicked_out_game_piece = did_player_hit_other_players(
-            game_piece_being_checked=current_game_piece, players=players)
-        if kicked_out_game_piece:
-            kicked_out_game_piece.reset()
+        if current_game_piece:
+            kicked_out_game_piece = did_player_hit_other_players(
+                game_piece_being_checked=current_game_piece, players=players)
+            if kicked_out_game_piece:
+                kicked_out_game_piece.reset()
 
 
 ######################################## End of game mechanics ########################################
@@ -104,7 +116,7 @@ def has_player_at_least_one_game_piece_on_game_board(current_player: Player) -> 
         bool: true if at least one playable game piece of the color is on the board
     """
     for game_piece in current_player.game_pieces:
-        if game_piece.is_on_field() and not game_piece.is_done(current_player.occupied):
+        if game_piece.is_on_field() and not game_piece.is_done:
             return True
     return False
 
@@ -138,7 +150,6 @@ def draw_winner(player: Player):
 
 
 def setup(amount_of_players=4) -> tuple[list[Player], Player]:
-    # TODO: setup() abhängig von der Anzahl an Spielern machen die spielen
     """A setup function so the game can start with initial values
 
     Args:
@@ -150,7 +161,7 @@ def setup(amount_of_players=4) -> tuple[list[Player], Player]:
     players: list[Player] = []
     for color in COLORS:
         players.append(Player(color=color, game_pieces=[GamePiece(
-            color, home_positions[color][i], speed=4) for i in range(4)]))
+            color, home_positions[color][i], speed=3) for i in range(4)]))
 
     for player, color in zip(players, COLORS):
         for game_piece in player.game_pieces:
@@ -184,10 +195,13 @@ def start_game_loop(amount_of_players=4):
         current_player = players[(index_of_current_player+1) % 4]
         won_player = has_one_player_won(players)
         iterations += 1
-        if iterations == 70:
+        if iterations == 300:
+            print(iterations)
             break
-    print(f"{won_player} has won the game")
-    # draw_winner(won_player)
+        if won_player:
+            print(iterations)
+    print(f"{won_player.color} has won the game")
+    draw_winner(won_player)
 
 ######################################## End of start & game loop ########################################
 
