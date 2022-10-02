@@ -11,14 +11,12 @@ GAME_PIECE_COLORS: dict[str, tuple[int]] = {"yellow": (255, 215, 0),
 
 vertices: tuple[tuple[float]] = ((-80.00, 80.00), (-80.00, 400.00), (80.00, 400.00),
                                  (80.00, 80.00), (400.00, 80.00), (400.00, -80.00),
-                                 (80.00, -80.00), (80.00, -
-                                                   400.00), (-80.00, -400.00),
+                                 (80.00, -80.00), (80.00, -400.00), (-80.00, -400.00),
                                  (-80.00, -80.00), (-400.00, -80.00), (-400.00, 80.00))
 """Vertex positions where a game piece has to turn"""
 
 vertices_for_left_turn: tuple[tuple[float]] = ((-80.00, 80.00), (80.00, 80.00),
                                                (80.00, -80.00), (-80.00, -80.00))
-# vertices_for_left_turn = tuple([(i*STEP_SIZE, j*STEP_SIZE) for i, j in zip((-1, -1, 1, 1), (-1, 1, 1, -1))])
 """Vertex positions where a game piece has to turn left"""
 
 vertices_for_right_turn: tuple[tuple[float]] = ((-80.00, 400.00), (80.00, 400.00), (400.00, 80.00), (400.00, -80.00),
@@ -35,7 +33,6 @@ turning_vertices_per_color: dict[str, tuple[float]] = {"yellow": (-400.00, 0.00)
                                                        "green": (0.00, 400.00),
                                                        "red": (400.00, 0.00),
                                                        "black": (0.00, -400.00)}
-# turning_vertices_per_color = {color: pos for color, pos in zip(COLORS, ((-STEP_SIZE*5, 0), (0, STEP_SIZE*5), (STEP_SIZE*5, 0), (0, -STEP_SIZE*5)))}
 """Vertex position accessed by color infront of the goal positon,
 so a game piece doesn't travel in an endless loop on the game board"""
 
@@ -63,7 +60,6 @@ home_positions: dict[str, tuple[tuple[float]]] = {"yellow": ((-390.00, 390.00), 
                                                   "black": ((-390.00, -320.00), (-320.00, -320.00), (-390.00, -390.00), (-320.00, -390.00))}
 """Vertex home positions accessed by color"""
 
-# HOME_ANGLES = {color: angle for color, angle in zip(COLORS, (90, 0, 270, 180))}
 HOME_ANGLES: dict[str, int] = {"yellow": 90,
                                "green": 0,
                                "red": 270,
