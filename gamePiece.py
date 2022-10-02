@@ -11,6 +11,8 @@ class GamePiece:
         color (str): the color of the game piece
         home_position (tuple[float]): home position of this game piece
         steps (int): steps the game piece has made
+        max_steps (int): max amount of steps the game piece can make
+        is_done (bool): is game piece in goal and not playable
 
     Methods:
         __init__(self, color: str, home_position: tuple[float], *, speed: int = 0) -> None
@@ -22,7 +24,7 @@ class GamePiece:
         get_future_pos(self, steps: int) -> tuple[float]
         get_pos(self) -> tuple[float]
         is_on_field(self) -> bool
-        is_done(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool
+        is_done_(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool
         is_in_goal(self) -> bool
         where_in_goal_index(self) -> int
     """
@@ -33,6 +35,8 @@ class GamePiece:
         self.color: str = color
         self.home_position = home_position
         self.steps: int = 0
+        self.max_steps = 6
+        self.is_done = False
 
         screen = Screen()
         screen.colormode(255)
@@ -58,7 +62,7 @@ class GamePiece:
         Returns:
             GamePiece: self
         """
-        for i in range(steps):
+        for _ in range(steps):
             if self.get_pos() in vertices_for_left_turn:
                 self.turtle.left(90)
             if self.get_pos() in vertices_for_right_turn or self.get_pos() == turning_vertices_per_color[self.color]:
@@ -98,10 +102,10 @@ class GamePiece:
         """
         future_pos = list(self.get_pos())
         future_heading = self.turtle.heading()
-        for i in range(steps):
-            if future_pos in vertices_for_left_turn:
+        for _ in range(steps):
+            if tuple(future_pos) in vertices_for_left_turn:
                 future_heading = (future_heading + 90) % 360
-            if future_pos in vertices_for_right_turn or future_pos == turning_vertices_per_color[self.color]:
+            if tuple(future_pos) in vertices_for_right_turn or tuple(future_pos) == turning_vertices_per_color[self.color]:
                 future_heading = (future_heading - 90) % 360
 
             if future_heading == 0:
@@ -126,18 +130,19 @@ class GamePiece:
         """Returns if a game piece is on the field
 
         On field means anywhere on the field except the home positions
-        A game piece can already be on the target and that counts as true
+        A game piece can already be on the goal and that counts as true
 
         Returns:
             bool: true if game piece is on field
         """
         return self.get_pos() not in home_positions[self.color]
+        # return self.get_pos() != self.home_position
 
-    def is_done(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool:
+    def is_done_(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool:
         """Returns if a game piece shouldn't move anymore
 
         A goal field is occupied when all the ongoing goal fields are occupied
-        and a game piece is on it that shouldn't move anymore
+        and a game piece on it shouldn't move anymore
 
         Args:
             occupied_goal_fields (dict[tuple[float], bool]): dict of the goal fields and if they are occupied
@@ -153,22 +158,23 @@ class GamePiece:
         """Check method if game piece is in goal
 
         Returns:
-            bool: true if game piece is somewhere in the goal positions
+            bool: true if game piece is somewhere on the goal positions
         """
-        return self.get_pos() in goal_positions
+        return self.get_pos() in goal_positions[self.color]
 
     def where_in_goal_index(self) -> int:
         """Getting the goal position of a game piece per index
 
-        Zero is the most inner position
-        Three the most outer position
+        0 is the most inner position
+        3 the most outer position
+        -1 if not in goal
 
         Returns:
             int: the index of the goal position
         """
         if self.is_in_goal():
-            for idx, coord in enumerate(goal_positions[self.color]):
-                if coord == self.get_pos():
+            for idx, pos in enumerate(goal_positions[self.color]):
+                if pos == self.get_pos():
                     return idx
         return -1
 
