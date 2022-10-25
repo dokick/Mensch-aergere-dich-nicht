@@ -1,5 +1,12 @@
-from turtle import Screen, Turtle, forward, pos, left, right, exitonclick
-from gameBoard import GAME_PIECE_COLORS, HOME_ANGLES, STEP_SIZE, home_positions, goal_positions, starting_vertices, vertices_for_left_turn, vertices_for_right_turn, turning_vertices_per_color
+"""
+This module represents a game piece
+"""
+from turtle import Screen, Turtle, exitonclick
+
+from gameBoard import (GAME_PIECE_COLORS, GOAL_POSITIONS, HOME_ANGLES,
+                       HOME_POSITIONS, STARTING_VERTICES, STEP_SIZE,
+                       VERTEX_FORE_GOAL, VERTICES_FOR_LEFT_TURN,
+                       VERTICES_FOR_RIGHT_TURN)
 from tools import convert_Vec2D_to_tuple
 
 
@@ -15,7 +22,8 @@ class GamePiece:
         is_done (bool): is game piece in goal and not playable
 
     Methods:
-        __init__(self, color: str, home_position: tuple[float], *, speed: int = 0) -> None
+        __init__(self, color: str, home_position: tuple[float, float],
+                 *, speed: int = 0) -> None
         __bool__(self) -> bool
         __repr__(self) -> str
         move(self, steps: int) -> GamePiece
@@ -29,7 +37,8 @@ class GamePiece:
         where_in_goal_index(self) -> int
     """
 
-    def __init__(self, color: str, home_position: tuple[float], *, speed: int = 0) -> None:
+    def __init__(self, color: str, home_position: tuple[float, float],
+                 *, speed: int = 0) -> None:
         """Initialzing attributes and setting up turtle"""
         self.turtle = Turtle()
         self.color: str = color
@@ -51,7 +60,7 @@ class GamePiece:
         return True
 
     def __repr__(self) -> str:
-        return f"{self.color = }\n{self.home_position = }\n{self.steps = }\n{self.turtle.speed() = }"
+        return f"{self.color}\n{self.home_position = }\n{self.steps = }\n{self.turtle.speed() = }"
 
     def move(self, steps: int):
         """Moving the turtle of the game piece
@@ -63,9 +72,10 @@ class GamePiece:
             GamePiece: self
         """
         for _ in range(steps):
-            if self.get_pos() in vertices_for_left_turn:
+            if self.get_pos() in VERTICES_FOR_LEFT_TURN:
                 self.turtle.left(90)
-            if self.get_pos() in vertices_for_right_turn or self.get_pos() == turning_vertices_per_color[self.color]:
+            if (self.get_pos() in VERTICES_FOR_RIGHT_TURN
+                    or self.get_pos() == VERTEX_FORE_GOAL[self.color]):
                 self.turtle.right(90)
             self.turtle.forward(STEP_SIZE)
             self.steps += 1
@@ -77,7 +87,7 @@ class GamePiece:
         Returns:
             GamePiece: self
         """
-        self.turtle.goto(starting_vertices[self.color])
+        self.turtle.goto(STARTING_VERTICES[self.color])
         return self
 
     def reset(self):
@@ -92,30 +102,31 @@ class GamePiece:
         return self
 
     def get_future_pos(self, steps: int) -> tuple[float]:
-        """Method for calculating the furure position of the game piece's turtle
+        """Calculates the furure position of the game piece's turtle
 
         Args:
             steps (int): amount of steps the game piece goes
 
         Returns:
-            tuple[float]: future position of the turtle 
+            tuple[float]: future position of the turtle
         """
         future_pos = list(self.get_pos())
         future_heading = self.turtle.heading()
         for _ in range(steps):
-            if tuple(future_pos) in vertices_for_left_turn:
+            if tuple(future_pos) in VERTICES_FOR_LEFT_TURN:
                 future_heading = (future_heading + 90) % 360
-            if tuple(future_pos) in vertices_for_right_turn or tuple(future_pos) == turning_vertices_per_color[self.color]:
+            if (tuple(future_pos) in VERTICES_FOR_RIGHT_TURN
+                    or tuple(future_pos) == VERTEX_FORE_GOAL[self.color]):
                 future_heading = (future_heading - 90) % 360
 
             if future_heading == 0:
-                future_pos[0] += STEP_SIZE # x+
+                future_pos[0] += STEP_SIZE  # x+
             elif future_heading == 90:
-                future_pos[1] += STEP_SIZE # y+
+                future_pos[1] += STEP_SIZE  # y+
             elif future_heading == 180:
-                future_pos[0] -= STEP_SIZE # x-
+                future_pos[0] -= STEP_SIZE  # x-
             elif future_heading == 270:
-                future_pos[1] -= STEP_SIZE # y-
+                future_pos[1] -= STEP_SIZE  # y-
         return tuple(future_pos)
 
     def get_pos(self) -> tuple[float]:
@@ -135,7 +146,7 @@ class GamePiece:
         Returns:
             bool: true if game piece is on field
         """
-        return self.get_pos() not in home_positions[self.color]
+        return self.get_pos() not in HOME_POSITIONS[self.color]
         # return self.get_pos() != self.home_position
 
     def is_done_(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool:
@@ -145,7 +156,7 @@ class GamePiece:
         and a game piece on it shouldn't move anymore
 
         Args:
-            occupied_goal_fields (dict[tuple[float], bool]): dict of the goal fields and if they are occupied
+            occupied_goal_fields (dict[tuple[float], bool]): dict of goal fields and if they are occupied
 
         Returns:
             bool: true if the game piece shouldn't move anymore
@@ -160,7 +171,7 @@ class GamePiece:
         Returns:
             bool: true if game piece is somewhere on the goal positions
         """
-        return self.get_pos() in goal_positions[self.color]
+        return self.get_pos() in GOAL_POSITIONS[self.color]
 
     def where_in_goal_index(self) -> int:
         """Getting the goal position of a game piece per index
@@ -173,7 +184,7 @@ class GamePiece:
             int: the index of the goal position
         """
         if self.is_in_goal():
-            for idx, pos in enumerate(goal_positions[self.color]):
+            for idx, pos in enumerate(GOAL_POSITIONS[self.color]):
                 if pos == self.get_pos():
                     return idx
         return -1
