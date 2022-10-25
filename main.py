@@ -1,25 +1,18 @@
-from turtle import exitonclick
-from random import choice
-from player import Player
-from gamePiece import GamePiece
-from gameBoard import game_board, draw_winner_on_board, HOME_ANGLES, COLORS, home_positions, goal_positions
-from tools import dice
-
 """
 Behaviour of players:
 
-- First priority is it to get the furthest game piece into one of the final positions,
-  no matter the risks or tactical advantages for other game pieces
-- If the player rolls a 1, 2 or 3 with the dice the player will use that on game pieces
-  that aren't all the way deep in the final positions,
+- First priority is it to get the furthest game piece into one of the final
+  positions, no matter the risks or tactical advantages for other game pieces
+- If the player rolls a 1, 2 or 3 with the dice the player will use that on
+  game pieces that aren't all the way deep in the final positions,
   if there's no tactical disadvantage for other game pieces
 
 Rules:
 
 When can a player/game piece NOT move
-- If the player has no game pieces on a playing field (Handled in make_a_move())
+- If player has no game pieces on a playing field (Handled in make_a_move())
 - If there are not enough fields that a game piece can move
-- If the game piece would land on a field with a game piece of the same color
+- If game piece would land on a field with a game piece of the same color
 
 Implemented Features:
 
@@ -28,7 +21,8 @@ Implemented Features:
 
 Not Yet Implemented Features:
 
-- When a player rolls a 6, but his game pieces can't move, a new game piece will come out
+- When a player rolls a 6, but his game pieces can't move,
+  a new game piece will come out
 - Rolling a 6 leads to making a move again
 - Deep check for when a player has won
 - Less than 4 players and user playing with them
@@ -36,22 +30,35 @@ Not Yet Implemented Features:
 TODO:
 - Spielfiguren können das Ziel überspringen
 - Spielfiguren derselben Farbe übereinander im Ziel
-- Wenn eine Spielfigur durch rauskommen eine andere Farbe rausschmeißen müsste, passiert es nicht
-- Priorität, dass bei geringer Würfelzahl die Spielfiguren im Ziel benutzt werden, funktioniert nicht
+- Wenn eine Spielfigur durch rauskommen eine andere Farbe rausschmeißen müsste,
+  passiert es nicht
+- Priorität, dass bei geringer Würfelzahl die Spielfiguren im Ziel
+  benutzt werden, funktioniert nicht
 """
 
-######################################## Start of game mechanics ########################################
+from random import choice
+from turtle import exitonclick
+
+from gameBoard import (COLORS, GOAL_POSITIONS, HOME_ANGLES, HOME_POSITIONS,
+                       draw_winner_on_board, game_board)
+from game_piece import GamePiece
+from player import Player
+from tools import dice
+
+############################## Start of game mechanics ##############################
 
 
-def did_player_hit_other_players(*, game_piece_being_checked: GamePiece, players: list[Player]) -> GamePiece | None:
-    """Helper function for the implementation of the game mechanic that players can hit other players
+def did_player_hit_other_players(*, game_piece_being_checked: GamePiece,
+                                    players: list[Player]) -> GamePiece | None:
+    """Helper function for the game mechanic that players can hit other players
 
     Args:
         game_piece_being_checked (GamePiece): the game piece that made a move
         players (list[Player]): information of all players
 
     Returns:
-        GamePiece | None: Returns the game piece that got hit by another player or None if no one got hit
+        GamePiece | None: Returns game piece that got hit by another player
+                          or None if no one got hit
     """
     for player in players:
         if player.color == game_piece_being_checked.color:
@@ -77,7 +84,8 @@ def get_permission() -> bool:
 def make_a_move(*, current_player: Player, players: list[Player]) -> None:
     """Simulates and also handles the move in the game
 
-    If a player has no game pieces to play with, the player has to get a new game piece on the board
+    If a player has no game pieces to play with,
+    the player has to get a new game piece on the board
     Otherwise the move gets validated and then the player moves
 
     Args:
@@ -85,11 +93,11 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
         players (list[Player]): information of all players
     """
     permission = False
-    has_gp_on_board = has_player_at_least_one_game_piece_on_game_board(current_player)
+    has_gp_on_board = has_player_playable_game_pieces_on_board(current_player)
     if not has_gp_on_board:
         permission = get_permission()
         if permission:
-            current_player.set_game_piece_to_start()
+            current_player.place_game_piece_on_start()
 
     if has_gp_on_board or permission:
         current_game_piece = current_player.move(dice())
@@ -101,13 +109,13 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
                 kicked_out_game_piece.reset()
 
 
-######################################## End of game mechanics ########################################
+############################## End of game mechanics ##############################
 
-######################################## Start of helper functions ########################################
+############################## Start of helper functions ##############################
 
 
-def has_player_at_least_one_game_piece_on_game_board(current_player: Player) -> bool:
-    """Checks if a player has at least one of it's game pieces that's playable on the board playing
+def has_player_playable_game_pieces_on_board(current_player: Player) -> bool:
+    """Checks if a player has at least one playable game piece on the board
 
     Args:
         current_player (Player): the player that has the current turn
@@ -133,19 +141,20 @@ def has_one_player_won(players: list[Player]) -> Player | None:
     for player in players:
         has_player_won = True
         for game_piece in player.game_pieces:
-            if game_piece.get_pos() not in goal_positions[player.color]:
+            if game_piece.get_pos() not in GOAL_POSITIONS[player.color]:
                 has_player_won = False
                 break
         if has_player_won:
             return player
     return None
 
-######################################## End of helper functions ########################################
+############################## End of helper functions ##############################
 
-######################################## Start of setup & game loop ########################################
+############################## Start of setup & game loop ##############################
 
 
 def draw_winner(player: Player):
+    """Draws winner by passing on the color of the player"""
     draw_winner_on_board(player.color)
 
 
@@ -156,12 +165,13 @@ def setup(amount_of_players=4) -> tuple[list[Player], Player]:
         amount_of_players (int): the amount of players in the game (not implemented yet)
 
     Returns:
-        tuple: first a tuple with all the players, second the player that starts the game
+        tuple: first a tuple with all the players,
+               second the player that starts the game
     """
     players: list[Player] = []
     for color in COLORS:
         players.append(Player(color=color, game_pieces=[GamePiece(
-            color, home_positions[color][i], speed=3) for i in range(4)]))
+            color, HOME_POSITIONS[color][i], speed=3) for i in range(4)]))
 
     for player, color in zip(players, COLORS):
         for game_piece in player.game_pieces:
@@ -177,7 +187,8 @@ def start_game_loop(amount_of_players=4):
     """Starts the game loop
 
     Loop works as follows:
-    - move the current player (validation and handling happens in move or in subfunctions of move)
+    - move the current player
+      (validation and handling happens in move or in subfunctions of move)
     - set the next player for the next iteration
     - check if someone has won yet
 
@@ -196,20 +207,25 @@ def start_game_loop(amount_of_players=4):
         won_player = has_one_player_won(players)
         iterations += 1
         if iterations == 300:
-            print(iterations)
             break
-        if won_player:
-            print(iterations)
+    print(f"{iterations =}")
     print(f"{won_player.color} has won the game")
     draw_winner(won_player)
 
-######################################## End of start & game loop ########################################
 
-
-def main():
+def start_game():
+    """Starts game"""
     game_board()
     start_game_loop()
     exitonclick()
+
+
+############################## End of start & game loop ##############################
+
+
+def main():
+    """pylint shut up"""
+    start_game()
 
 
 if __name__ == "__main__":
