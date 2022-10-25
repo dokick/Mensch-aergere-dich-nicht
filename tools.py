@@ -1,3 +1,11 @@
+"""
+This module is just a collection of useful functions.
+
+Functions:
+    dice() -> int
+    convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float, float]
+"""
+
 from random import randint
 from turtle import Vec2D
 
@@ -11,14 +19,16 @@ def dice() -> int:
     return randint(1, 6)
 
 
-def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float]:
+def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float, float]:
     """Converting a Vec2D Vector from turtle
 
-    Used for getting the position of a turtle and not worry about compatibility issues
-    We are rounding to the last 2 digits, because the turtle GUI can scramble up numbers
+    Used for getting the position of a turtle
+    and not worry about compatibility issues
+    We are rounding to the last 2 digits,
+    because the turtle GUI can scramble up numbers
 
     Args:
-        pos (Vec2D): turtle's position
+        pos (Vec2D): turtle's position (x, y)
 
     Returns:
         tuple: turtle's position (x, y)
