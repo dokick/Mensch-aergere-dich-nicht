@@ -3,7 +3,7 @@ This module represents a game piece
 """
 from turtle import Screen, Turtle, exitonclick
 
-from gameBoard import (GAME_PIECE_COLORS, GOAL_POSITIONS, HOME_ANGLES,
+from game_board import (GAME_PIECE_COLORS, GOAL_POSITIONS, HOME_ANGLES,
                        HOME_POSITIONS, STARTING_VERTICES, STEP_SIZE,
                        VERTEX_FORE_GOAL, VERTICES_FOR_LEFT_TURN,
                        VERTICES_FOR_RIGHT_TURN)

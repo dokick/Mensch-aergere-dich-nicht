@@ -39,7 +39,7 @@ TODO:
 from random import choice
 from turtle import exitonclick
 
-from gameBoard import (COLORS, GOAL_POSITIONS, HOME_ANGLES, HOME_POSITIONS,
+from game_board import (COLORS, GOAL_POSITIONS, HOME_ANGLES, HOME_POSITIONS,
                        draw_winner_on_board, game_board)
 from game_piece import GamePiece
 from player import Player
