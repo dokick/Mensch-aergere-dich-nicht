@@ -1,5 +1,12 @@
-from gamePiece import GamePiece
-from gameBoard import goal_positions, home_positions, enough_vertices_per_color
+"""
+This module represents a player
+
+Classes:
+    Player
+"""
+
+from game_board import GOAL_POSITIONS, HOME_POSITIONS, TWO_VERTICES_FORE_GOAL
+from game_piece import GamePiece
 
 
 class Player:
@@ -7,25 +14,28 @@ class Player:
 
     Attributes:
         color (str): color of the player
-        game_pieces (list[GamePiece]): all game pieces of the same color assigned to a player
+        game_pieces (list[GamePiece]): all game pieces of the same color
+                                       assigned to a player
         occupied (dict[tuple[float], bool]): dict of the goal positions with a marker, true means occupied
 
     Methods:
-        __init__(self, *, color: str, game_pieces: list[GamePiece]) -> None
+        __init__(self, *, size: str, color: str, game_pieces: list[GamePiece]) -> None
         __bool__(self) -> bool
         __repr__(self) -> str
         get_valid_game_pieces(self, steps: int) -> list[GamePiece]
         pick_game_piece(self, steps: int) -> GamePiece
         move(self, steps: int) -> None
-        set_game_piece_to_start(self) -> None
+        check_if_done(self) -> None
+        place_game_piece_on_start(self) -> None
     """
 
-    def __init__(self, *, color: str, game_pieces: list[GamePiece]) -> None:
+    def __init__(self, *, board_size: str, color: str, game_pieces: list[GamePiece]) -> None:
         """Initializing attributes"""
+        self.board_size = board_size
         self.color = color
         self.game_pieces = game_pieces
         self.occupied: dict[tuple[float], bool] = {
-            pos: False for pos in goal_positions[self.color]}
+            pos: False for pos in GOAL_POSITIONS(self.board_size)[self.color]}
 
     def __bool__(self) -> bool:
         """Existence of a player should be treated as True"""
@@ -38,7 +48,8 @@ class Player:
         """Validates all potential moves that the player has
 
         First handles if there are enough fields that a game piece can move
-        Second handles if the game piece would land on a field with a game piece of the same color
+        Second handles if the game piece would land
+        on a field with a game piece of the same color
 
         This is handled all in one function to ensure order,
         because if checked out of order the case could happen
@@ -47,29 +58,50 @@ class Player:
 
         Args:
             steps (int): amount of steps the game piece goes
-            players (list[Player]): information of all players
 
         Returns:
-            list[GamePiece]: list of all game pieces that qualify for a valid move, if empty player has no valid moves
+            list[GamePiece]: list of all game pieces that qualify for
+                             a valid move, if empty player has no valid moves
         """
-        potential_game_pieces: list[GamePiece] = []
+        # TODO: BIGTODO the whole method
+        are_home_pieces_valid = True
         for game_piece in self.game_pieces:
-            if game_piece.get_pos() not in goal_positions[self.color] or game_piece.get_pos() not in enough_vertices_per_color[self.color]:
-                potential_game_pieces.append(game_piece)
-            if game_piece.is_done(self.occupied):
-                continue
+            if game_piece.is_on_field():
+                are_home_pieces_valid = False
 
-            if game_piece.get_pos() == goal_positions[self.color][1] and steps > 1:
+        potential_game_pieces: list[GamePiece] = []
+
+        for game_piece in self.game_pieces:
+            gp_pos = game_piece.get_pos()
+            if game_piece.is_done:
                 continue
-            elif game_piece.get_pos() == goal_positions[self.color][2] and steps > 2:
+            if are_home_pieces_valid and (gp_pos in HOME_POSITIONS(self.board_size)[self.color]):
                 continue
-            elif game_piece.get_pos() == goal_positions[self.color][3] and steps > 3:
-                continue
-            elif game_piece.get_pos() == enough_vertices_per_color[self.color][0] and steps > 4:
-                continue
-            elif game_piece.get_pos() == enough_vertices_per_color[self.color][1] and steps > 5:
-                continue
-            potential_game_pieces.append(game_piece)
+            if (gp_pos not in GOAL_POSITIONS(self.board_size)[self.color]
+                    or gp_pos not in TWO_VERTICES_FORE_GOAL(self.board_size)[self.color]):
+                potential_game_pieces.append(game_piece)
+
+            if gp_pos == GOAL_POSITIONS(self.board_size)[self.color][2]:
+                game_piece.max_steps = 2
+            elif gp_pos == GOAL_POSITIONS(self.board_size)[self.color][3]:
+                game_piece.max_steps = 3
+            elif gp_pos == TWO_VERTICES_FORE_GOAL(self.board_size)[self.color][0]:
+                game_piece.max_steps = 4
+            elif gp_pos == TWO_VERTICES_FORE_GOAL(self.board_size)[self.color][1]:
+                game_piece.max_steps = 5
+            if steps <= game_piece.max_steps:
+                potential_game_pieces.append(game_piece)
+
+            # if game_piece.get_pos() == goal_positions[self.color][1] and steps > 1:
+            #     continue
+            # elif game_piece.get_pos() == goal_positions[self.color][2] and steps > 2:
+            #     continue
+            # elif game_piece.get_pos() == goal_positions[self.color][3] and steps > 3:
+            #     continue
+            # elif game_piece.get_pos() == enough_vertices_per_color[self.color][0] and steps > 4:
+            #     continue
+            # elif game_piece.get_pos() == enough_vertices_per_color[self.color][1] and steps > 5:
+            #     continue
 
         final_game_pieces: list[GamePiece] = []
 
@@ -92,7 +124,8 @@ class Player:
             steps (int): amount of steps the game piece goes
 
         Returns:
-            GamePiece | None: the game piece that gets finally picked for the move or None if no game pieces are available
+            GamePiece | None: game piece that gets finally picked for the move
+                              or None if no game pieces are available
         """
         game_pieces = self.get_valid_game_pieces(steps)
         if not game_pieces:
@@ -112,11 +145,16 @@ class Player:
     def move(self, steps: int) -> GamePiece | None:
         """Makes the move for a player
 
+        First is there even a game piece.
+        Second handle done situation if in goal.
+
         Args:
             steps (int): amount of steps the game piece goes
 
         Returns:
-            GamePiece | None: the game piece that got the move, used to handle rules of the game or None if no game pieces are available
+            GamePiece | None: game piece that got the move,
+                              used to handle rules of the game
+                              or None if no game pieces are available
         """
         current_game_piece = self.pick_game_piece(steps)
         if not current_game_piece:
@@ -124,37 +162,72 @@ class Player:
         current_game_piece = current_game_piece.move(steps)
 
         if current_game_piece.is_in_goal():
-            for game_piece in self.game_pieces:
-                if not game_piece.is_in_goal():
-                    continue
-                gp_pos = game_piece.get_pos()
-                for pos, flag in self.occupied.items():
-                    if not flag:
-                        idx = goal_positions[self.color].index(gp_pos)
-                        if idx == 0:
-                            self.occupied[pos] = True
-                        elif idx == 1:
-                            self.occupied[pos] = True
-                        elif idx == 2:
-                            self.occupied[pos] = True
-                        elif idx == 3:
-                            self.occupied[pos] = True
-            # TODO: For-Loops vlt tauschen
+            self.check_if_done()
+
         return current_game_piece
 
-    def set_game_piece_to_start(self) -> None:
-        """Puts a game piece of the corresponding color on the starting vertex"""
+    def check_if_done(self) -> None:
+        """Checks the situation on the goal positions and marks done if needed
+
+        First is it already done
+        Second is it on goal, if yes where
+        Third mark as done if it meets conditions
+        """
+        for game_piece in self.game_pieces:
+            if game_piece.is_done:
+                continue
+
+            idx = game_piece.where_in_goal_index()
+            if idx == -1:
+                continue
+
+            for i in range(4):
+                if i == idx == 0:
+                    game_piece.is_done = True
+                    break
+                elif i == idx == 1:
+                    game_piece.is_done = True
+                    break
+                elif i == idx == 2:
+                    game_piece.is_done = True
+                    break
+                elif i == idx == 3:
+                    game_piece.is_done = True
+                    break
+            # gp_pos = game_piece.get_pos()
+            # for pos, flag in self.occupied.items():
+            #     if not flag:
+            #         idx = goal_positions[self.color].index(gp_pos)
+            #         if idx == 0:
+            #             self.occupied[pos] = True
+            #         elif idx == 1:
+            #             self.occupied[pos] = True
+            #         elif idx == 2:
+            #             self.occupied[pos] = True
+            #         elif idx == 3:
+            #             self.occupied[pos] = True
+
+    def place_game_piece_on_start(self) -> None:
+        """Puts a game piece of the assigned color on the starting vertex"""
         game_pieces_at_home: list[GamePiece] = []
         for game_piece in self.game_pieces:
             if not game_piece.is_on_field():
                 game_pieces_at_home.append(game_piece)
-        game_pieces_at_home[0].get_out()
+        # print(game_pieces_at_home)
+        if game_pieces_at_home:
+            game_pieces_at_home[0].get_out()
 
 
 def main():
+    """For testing and debugging purposes"""
     color = "yellow"
-    player = Player(color=color, game_pieces=[
-                    GamePiece(color, home_positions[color][i]) for i in range(4)])
+    size = "medium"
+    player = Player(board_size = size,
+                    color=color,
+                    game_pieces=[GamePiece(size,
+                                           color,
+                                           HOME_POSITIONS(size)[color][i])
+                                           for i in range(4)])
     print(player)
     print(bool(player))  # True
     print(not player)  # False

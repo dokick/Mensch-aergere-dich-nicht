@@ -40,7 +40,7 @@ from random import choice
 from turtle import exitonclick
 
 from game_board import (COLORS, GOAL_POSITIONS, HOME_ANGLES, HOME_POSITIONS,
-                       draw_winner_on_board, game_board)
+                        draw_winner_on_board, game_board)
 from game_piece import GamePiece
 from player import Player
 from tools import dice
@@ -49,7 +49,7 @@ from tools import dice
 
 
 def did_player_hit_other_players(*, game_piece_being_checked: GamePiece,
-                                    players: list[Player]) -> GamePiece | None:
+                                 players: list[Player]) -> GamePiece | None:
     """Helper function for the game mechanic that players can hit other players
 
     Args:
@@ -129,7 +129,7 @@ def has_player_playable_game_pieces_on_board(current_player: Player) -> bool:
     return False
 
 
-def has_one_player_won(players: list[Player]) -> Player | None:
+def has_one_player_won(size: str, players: list[Player]) -> Player | None:
     """Checks if a player has won yet
 
     Args:
@@ -141,7 +141,7 @@ def has_one_player_won(players: list[Player]) -> Player | None:
     for player in players:
         has_player_won = True
         for game_piece in player.game_pieces:
-            if game_piece.get_pos() not in GOAL_POSITIONS[player.color]:
+            if game_piece.get_pos() not in GOAL_POSITIONS(size)[player.color]:
                 has_player_won = False
                 break
         if has_player_won:
@@ -158,7 +158,7 @@ def draw_winner(player: Player):
     draw_winner_on_board(player.color)
 
 
-def setup(amount_of_players=4) -> tuple[list[Player], Player]:
+def setup(size: str, amount_of_players: int) -> tuple[list[Player], Player]:
     """A setup function so the game can start with initial values
 
     Args:
@@ -170,8 +170,8 @@ def setup(amount_of_players=4) -> tuple[list[Player], Player]:
     """
     players: list[Player] = []
     for color in COLORS:
-        players.append(Player(color=color, game_pieces=[GamePiece(
-            color, HOME_POSITIONS[color][i], speed=3) for i in range(4)]))
+        players.append(Player(board_size=size, color=color, game_pieces=[GamePiece(
+            size, color, HOME_POSITIONS(size)[color][i], speed=3) for i in range(4)]))
 
     for player, color in zip(players, COLORS):
         for game_piece in player.game_pieces:
@@ -183,7 +183,7 @@ def setup(amount_of_players=4) -> tuple[list[Player], Player]:
     return players, starting_player
 
 
-def start_game_loop(amount_of_players=4):
+def start_game_loop(size: str = "medium", amount_of_players: int = 4):
     """Starts the game loop
 
     Loop works as follows:
@@ -195,7 +195,7 @@ def start_game_loop(amount_of_players=4):
     Args:
         amount_of_players (int): the amount of players that are playing (not implemented yet)
     """
-    players, current_player = setup(amount_of_players)
+    players, current_player = setup(size, amount_of_players)
     index_of_current_player = players.index(current_player)
     won_player = None
     iterations = 0
@@ -204,7 +204,7 @@ def start_game_loop(amount_of_players=4):
         make_a_move(current_player=current_player, players=players)
         index_of_current_player += 1
         current_player = players[(index_of_current_player+1) % 4]
-        won_player = has_one_player_won(players)
+        won_player = has_one_player_won(size, players)
         iterations += 1
         if iterations == 300:
             break
