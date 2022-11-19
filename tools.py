@@ -31,9 +31,9 @@ def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float, float]:
         pos (Vec2D): turtle's position (x, y)
 
     Returns:
-        tuple: turtle's position (x, y)
+        tuple[float, float]: turtle's position (x, y)
     """
-    return tuple([round(i, 2) for i in pos])
+    return tuple((round(i, 2) for i in pos))
 
 
 if __name__ == "__main__":

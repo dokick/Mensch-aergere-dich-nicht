@@ -5,7 +5,7 @@ Classes:
     Player
 """
 
-from game_board import GOAL_POSITIONS, HOME_POSITIONS, TWO_VERTICES_FORE_GOAL
+from game_board import goal_positions, home_positions, two_vertices_fore_goal
 from game_piece import GamePiece
 
 
@@ -16,10 +16,11 @@ class Player:
         color (str): color of the player
         game_pieces (list[GamePiece]): all game pieces of the same color
                                        assigned to a player
-        occupied (dict[tuple[float], bool]): dict of the goal positions with a marker, true means occupied
+        occupied (dict[tuple[float], bool]): dict of the goal positions with a marker,
+                                             true means occupied
 
     Methods:
-        __init__(self, *, size: str, color: str, game_pieces: list[GamePiece]) -> None
+        __init__(self, *, board_size: str, color: str, game_pieces: list[GamePiece]) -> None
         __bool__(self) -> bool
         __repr__(self) -> str
         get_valid_game_pieces(self, steps: int) -> list[GamePiece]
@@ -30,12 +31,18 @@ class Player:
     """
 
     def __init__(self, *, board_size: str, color: str, game_pieces: list[GamePiece]) -> None:
-        """Initializing attributes"""
+        """Initializing attributes
+
+        Args:
+            board_size (str): size of game board. look into SIZES for sizes
+            color (str): color of player
+            game_pieces (list[GamePiece]): game pieces that belong to player
+        """
         self.board_size = board_size
         self.color = color
         self.game_pieces = game_pieces
         self.occupied: dict[tuple[float], bool] = {
-            pos: False for pos in GOAL_POSITIONS(self.board_size)[self.color]}
+            pos: False for pos in goal_positions(self.board_size)[self.color]}
 
     def __bool__(self) -> bool:
         """Existence of a player should be treated as True"""
@@ -75,19 +82,19 @@ class Player:
             gp_pos = game_piece.get_pos()
             if game_piece.is_done:
                 continue
-            if are_home_pieces_valid and (gp_pos in HOME_POSITIONS(self.board_size)[self.color]):
+            if are_home_pieces_valid and (gp_pos in home_positions(self.board_size)[self.color]):
                 continue
-            if (gp_pos not in GOAL_POSITIONS(self.board_size)[self.color]
-                    or gp_pos not in TWO_VERTICES_FORE_GOAL(self.board_size)[self.color]):
+            if (gp_pos not in goal_positions(self.board_size)[self.color]
+                    or gp_pos not in two_vertices_fore_goal(self.board_size)[self.color]):
                 potential_game_pieces.append(game_piece)
 
-            if gp_pos == GOAL_POSITIONS(self.board_size)[self.color][2]:
+            if gp_pos == goal_positions(self.board_size)[self.color][2]:
                 game_piece.max_steps = 2
-            elif gp_pos == GOAL_POSITIONS(self.board_size)[self.color][3]:
+            elif gp_pos == goal_positions(self.board_size)[self.color][3]:
                 game_piece.max_steps = 3
-            elif gp_pos == TWO_VERTICES_FORE_GOAL(self.board_size)[self.color][0]:
+            elif gp_pos == two_vertices_fore_goal(self.board_size)[self.color][0]:
                 game_piece.max_steps = 4
-            elif gp_pos == TWO_VERTICES_FORE_GOAL(self.board_size)[self.color][1]:
+            elif gp_pos == two_vertices_fore_goal(self.board_size)[self.color][1]:
                 game_piece.max_steps = 5
             if steps <= game_piece.max_steps:
                 potential_game_pieces.append(game_piece)
@@ -226,7 +233,7 @@ def main():
                     color=color,
                     game_pieces=[GamePiece(size,
                                            color,
-                                           HOME_POSITIONS(size)[color][i])
+                                           home_positions(size)[color][i])
                                            for i in range(4)])
     print(player)
     print(bool(player))  # True

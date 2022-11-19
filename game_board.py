@@ -10,11 +10,11 @@ Functions:
     create_pattern_as_list(x: float, y: float | None = None) -> list[list[float]]
     game_board(size: str = "medium") -> None
     draw_winner_on_board(color: str)
-    VERTICES_FOR_LEFT_TURN(size: str) -> tuple[tuple[float, float],
+    vertices_for_left_turn(size: str) -> tuple[tuple[float, float],
                                                tuple[float, float],
                                                tuple[float, float],
                                                tuple[float, float]]
-    VERTICES_FOR_RIGHT_TURN(size: str) -> tuple[tuple[float, float],
+    vertices_for_right_turn(size: str) -> tuple[tuple[float, float],
                                                 tuple[float, float],
                                                 tuple[float, float],
                                                 tuple[float, float],
@@ -22,17 +22,17 @@ Functions:
                                                 tuple[float, float],
                                                 tuple[float, float],
                                                 tuple[float, float]]
-    STARTING_VERTICES(size: str) -> dict[str, tuple[float, float]]
-    VERTEX_FORE_GOAL(size: str) -> dict[str, tuple[float, float]]
-    TWO_VERTICES_FORE_GOAL(size: str) -> dict[str,
+    starting_vertices(size: str) -> dict[str, tuple[float, float]]
+    vertex_fore_goal(size: str) -> dict[str, tuple[float, float]]
+    two_vertices_fore_goal(size: str) -> dict[str,
                                               tuple[tuple[float, float],
                                                     tuple[float, float]]]
-    GOAL_POSITIONS(size: str) -> dict[str,
+    goal_positions(size: str) -> dict[str,
                                       tuple[tuple[float, float],
                                             tuple[float, float],
                                             tuple[float, float],
                                             tuple[float, float]]]
-    HOME_POSITIONS(size: str) -> dict[str,
+    home_positions(size: str) -> dict[str,
                                       tuple[tuple[float, float],
                                             tuple[float, float],
                                             tuple[float, float],
@@ -43,9 +43,11 @@ from turtle import (back, begin_fill, circle, end_fill, exitonclick, fillcolor,
                     forward, goto, hideturtle, left, pencolor, pendown,
                     pensize, penup, right, seth, shape, speed, write)
 
-SIZES: dict[str, int] = {"small": 64,
+SIZES: dict[str, int] = {"x-small": 48,
+                         "small": 64,
                          "medium": 80,
-                         "large": 96}
+                         "large": 96,
+                         "x-large": 112}
 """Distance between two fields, should be divisible by 8"""
 
 COLORS = ("yellow", "green", "red", "black")
@@ -71,10 +73,10 @@ MATRIX: tuple[tuple[int, int],
               tuple[int, int]] = ((-1, 1), (1, 1), (1, -1), (-1, -1))
 
 
-def create_pattern(x: float, y: float | None = None) -> tuple[tuple[float, float],
-                                                              tuple[float, float],
-                                                              tuple[float, float],
-                                                              tuple[float, float]]:
+def create_pattern(x: float, y: float | None = None, /) -> tuple[tuple[float, float],
+                                                                 tuple[float, float],
+                                                                 tuple[float, float],
+                                                                 tuple[float, float]]:
     """Creates tuple with the following pattern
     ((-x, y), (y, x), (x, -y), (-y, -x))
 
@@ -98,7 +100,7 @@ def create_pattern(x: float, y: float | None = None) -> tuple[tuple[float, float
     return tuple(tmp)
 
 
-def create_pattern_as_list(x: float, y: float | None = None) -> list[list[float]]:
+def create_pattern_as_list(x: float, y: float | None = None, /) -> list[list[float]]:
     """Creates list with the following pattern
     [[-x, y], [y, x], [x, -y], [-y, -x]]
 
@@ -123,7 +125,7 @@ def game_board(size: str = "medium") -> None:
     """Draws a game board
 
     Args:
-        size (str): small, medium or large
+        size (str, optional): size of game board. look into SIZES for sizes. Defaults to "medium".
     """
 
     dist: int = SIZES[size]
@@ -172,9 +174,9 @@ def game_board(size: str = "medium") -> None:
     seth(270)
     fillcolor('white')
     for i in range(4):
-        for j in range(2):
+        for _ in range(2):
             pendown()
-            for _ in range(4):
+            for __ in range(4):
                 draw_one_unit()
             penup()
             forward(dist//4)
@@ -245,7 +247,7 @@ def game_board(size: str = "medium") -> None:
             right(90)
 
     school = 'Blackadder ITC'
-    home = 'AR DECODE'
+    # home = 'AR DECODE'
     off = 0
     for idx, (word, pos) in enumerate(zip(('Mensch', 'ärgere', 'nicht', 'dich'),
                                           create_pattern(dist*2 + dist//2))):
@@ -261,7 +263,7 @@ def draw_winner_on_board(color: str):
     """Draws winner on the game board
 
     Args:
-        color (str): the color that won
+        color (str): color that won
     """
     hideturtle()
     speed(0)
@@ -275,14 +277,47 @@ def draw_winner_on_board(color: str):
     write("WON", move=False, align="center", font=("Arial", 150, "normal"))
 
 
-def VERTICES_FOR_LEFT_TURN(size: str) -> tuple[tuple[float, float],
+def has_to_turn_left(x: float, y: float, /, size: str) -> bool:
+    """Checks if game piece has to turn left
+
+    Args:
+        x (float): x pos
+        y (float): y pos
+        size (str): size of game board. look into SIZES for sizes
+
+    Returns:
+        bool: true if game piece has to turn left on vertex (x, y)
+    """
+    dist = SIZES[size]
+    x, y = abs(x), abs(y)
+    return x == dist and y == dist
+
+
+def has_to_turn_right(x: float, y: float, /, size: str) -> bool:
+    """Checks if game piece has to turn right
+
+    Args:
+        x (float): x pos
+        y (float): y pos
+        size (str): size of game board. look into SIZES for sizes
+
+    Returns:
+        bool: true if game piece has to turn right on vertex (x, y)
+    """
+    dist = SIZES[size]
+    x, y = abs(x), abs(y)
+    # TODO: Missing pos infront of goal
+    return (x == dist * 5 and y == dist) or (x == dist and y == dist * 5)
+
+
+def vertices_for_left_turn(size: str) -> tuple[tuple[float, float],
                                                tuple[float, float],
                                                tuple[float, float],
                                                tuple[float, float]]:
     """Vertex positions where a game piece has to turn left
 
     Args:
-        size (str): small, medium or large
+        size (str): size of game board. look into SIZES for sizes
 
     Returns:
         tuple[tuple[float, float],
@@ -295,7 +330,7 @@ def VERTICES_FOR_LEFT_TURN(size: str) -> tuple[tuple[float, float],
 # VERTICES_FOR_LEFT_TURN = create_pattern(STEP_SIZE)
 
 
-def VERTICES_FOR_RIGHT_TURN(size: str) -> tuple[tuple[float, float],
+def vertices_for_right_turn(size: str) -> tuple[tuple[float, float],
                                                 tuple[float, float],
                                                 tuple[float, float],
                                                 tuple[float, float],
@@ -306,7 +341,7 @@ def VERTICES_FOR_RIGHT_TURN(size: str) -> tuple[tuple[float, float],
     """Vertex positions where a game piece has to turn right
 
     Args:
-        size (str): small, medium or large
+        size (str): size of game board. look into SIZES for sizes
 
     Returns:
         tuple[tuple[float, float],
@@ -324,11 +359,11 @@ def VERTICES_FOR_RIGHT_TURN(size: str) -> tuple[tuple[float, float],
 #                            + create_pattern(STEP_SIZE*5, STEP_SIZE))
 
 
-def STARTING_VERTICES(size: str) -> dict[str, tuple[float, float]]:
+def starting_vertices(size: str) -> dict[str, tuple[float, float]]:
     """Vertex position accessed by color where a game piece starts
 
     Args:
-        size (str): small, medium or large
+        size (str): size of game board. look into SIZES for sizes
 
     Returns:
         dict[str, tuple[float, float]]: vertices for starting point
@@ -342,12 +377,12 @@ def STARTING_VERTICES(size: str) -> dict[str, tuple[float, float]]:
 #                      in zip(COLORS, create_pattern(STEP_SIZE*5, STEP_SIZE))}
 
 
-def VERTEX_FORE_GOAL(size: str) -> dict[str, tuple[float, float]]:
+def vertex_fore_goal(size: str) -> dict[str, tuple[float, float]]:
     """Vertex position accessed by color infront of the goal positon,
     so a game piece doesn't travel in an endless loop on the game board
 
     Args:
-        size (str): small, medium or large
+        size (str): size of game board. look into SIZES for sizes
 
     Returns:
         dict[str, tuple[float, float]]: vertex infront of goal pos
@@ -361,14 +396,14 @@ def VERTEX_FORE_GOAL(size: str) -> dict[str, tuple[float, float]]:
 #                     in zip(COLORS, create_pattern(STEP_SIZE*5, 0))}
 
 
-def TWO_VERTICES_FORE_GOAL(size: str) -> dict[str,
+def two_vertices_fore_goal(size: str) -> dict[str,
                                               tuple[tuple[float, float],
                                                     tuple[float, float]]]:
     """Vertex positions accessed by color that are two steps infront of the goal.
     Used to ensure that there are enough vertices a game piece can travel
 
     Args:
-        size (str): small, medium or large
+        size (str): size of game board. look into SIZES for sizes
 
     Returns:
         dict[str,
@@ -377,8 +412,8 @@ def TWO_VERTICES_FORE_GOAL(size: str) -> dict[str,
     """
     dist = SIZES[size]
     rev_vert_4_goal = list(reversed(create_pattern_as_list(dist*5, dist)))
-    for idx, val in enumerate(rev_vert_4_goal):
-        rev_vert_4_goal[idx][0], rev_vert_4_goal[idx][1] = rev_vert_4_goal[idx][1], rev_vert_4_goal[idx][0]
+    for idx, pos in enumerate(rev_vert_4_goal):
+        pos[0], pos[1] = pos[1], pos[0]
         rev_vert_4_goal[idx] = tuple(rev_vert_4_goal[idx])
 
     swapped_vert_fore_goal: tuple[tuple[float, float],
@@ -394,7 +429,8 @@ def TWO_VERTICES_FORE_GOAL(size: str) -> dict[str,
 # dist = SIZES[size]
 # rev_vert_4_goal = list(reversed(create_pattern_as_list(dist*5, dist)))
 # for idx, val in enumerate(rev_vert_4_goal):
-#     rev_vert_4_goal[idx][0], rev_vert_4_goal[idx][1] = rev_vert_4_goal[idx][1], rev_vert_4_goal[idx][0]
+#     rev_vert_4_goal[idx][0], rev_vert_4_goal[idx][1] = rev_vert_4_goal[idx][1],
+#                                                        rev_vert_4_goal[idx][0]
 #     rev_vert_4_goal[idx] = tuple(rev_vert_4_goal[idx])
 #
 # swapped_vert_fore_goal: tuple[tuple[float, float],
@@ -408,7 +444,7 @@ def TWO_VERTICES_FORE_GOAL(size: str) -> dict[str,
 #                                  swapped_vert_fore_goal)}
 
 
-def GOAL_POSITIONS(size: str) -> dict[str,
+def goal_positions(size: str) -> dict[str,
                                       tuple[tuple[float, float],
                                             tuple[float, float],
                                             tuple[float, float],
@@ -416,7 +452,7 @@ def GOAL_POSITIONS(size: str) -> dict[str,
     """Vertex goal positions accessed by color
 
     Args:
-        size (str): small, medium or large
+        size (str): size of game board. look into SIZES for sizes
 
     Returns:
         dict[str,
@@ -443,7 +479,7 @@ def GOAL_POSITIONS(size: str) -> dict[str,
 #                          create_pattern(dist*4, 0))}
 
 
-def HOME_POSITIONS(size: str) -> dict[str,
+def home_positions(size: str) -> dict[str,
                                       tuple[tuple[float, float],
                                             tuple[float, float],
                                             tuple[float, float],
@@ -451,7 +487,7 @@ def HOME_POSITIONS(size: str) -> dict[str,
     """Vertex home positions accessed by color
 
     Args:
-        size (str): small, medium or large
+        size (str): size of game board. look into SIZES for sizes
 
     Returns:
         dict[str,
@@ -489,4 +525,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print(two_vertices_fore_goal("medium"))
     main()

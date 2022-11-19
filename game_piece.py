@@ -3,10 +3,10 @@ This module represents a game piece
 """
 from turtle import Screen, Turtle, exitonclick
 
-from game_board import (GAME_PIECE_COLORS, GOAL_POSITIONS, HOME_ANGLES,
-                       HOME_POSITIONS, STARTING_VERTICES, SIZES,
-                       VERTEX_FORE_GOAL, VERTICES_FOR_LEFT_TURN,
-                       VERTICES_FOR_RIGHT_TURN)
+from game_board import (GAME_PIECE_COLORS, goal_positions, HOME_ANGLES,
+                        home_positions, SIZES, starting_vertices,
+                        vertex_fore_goal, vertices_for_left_turn,
+                        vertices_for_right_turn, has_to_turn_left, has_to_turn_right)
 from tools import convert_Vec2D_to_tuple
 
 
@@ -22,7 +22,7 @@ class GamePiece:
         is_done (bool): is game piece in goal and not playable
 
     Methods:
-        __init__(self, color: str, home_position: tuple[float, float],
+        __init__(self, board_size: str, color: str, home_position: tuple[float, float],
                  *, speed: int = 0) -> None
         __bool__(self) -> bool
         __repr__(self) -> str
@@ -39,9 +39,16 @@ class GamePiece:
 
     def __init__(self, board_size: str, color: str, home_position: tuple[float, float],
                  *, speed: int = 0) -> None:
-        """Initialzing attributes and setting up turtle"""
+        """Initialzing attributes and setting up turtle
+
+        Args:
+            board_size (str): size of game board. look into SIZES for sizes
+            color (str): color of game piece
+            home_position (tuple[float, float]): home pos of game board
+            speed (int, optional): speed of game piece. Defaults to 0.
+        """
         self.board_size = board_size
-        self.turtle = Turtle()
+        self.turtle = Turtle(shape="turtle")
         self.color: str = color
         self.home_position = home_position
         self.steps: int = 0
@@ -53,7 +60,6 @@ class GamePiece:
         self.turtle.fillcolor(GAME_PIECE_COLORS[self.color])
         self.turtle.pencolor(255, 255, 255)
         self.turtle.speed(speed)
-        self.turtle.shape("turtle")
         self.turtle.penup()
 
     def __bool__(self) -> bool:
@@ -74,10 +80,31 @@ class GamePiece:
         """
         dist = SIZES[self.board_size]
         for _ in range(steps):
-            if self.get_pos() in VERTICES_FOR_LEFT_TURN(self.board_size):
+            if self.get_pos() in vertices_for_left_turn(self.board_size):
                 self.turtle.left(90)
-            if (self.get_pos() in VERTICES_FOR_RIGHT_TURN(self.board_size)
-                    or self.get_pos() == VERTEX_FORE_GOAL(self.board_size)[self.color]):
+            if (self.get_pos() in vertices_for_right_turn(self.board_size)
+                    or self.get_pos() == vertex_fore_goal(self.board_size)[self.color]):
+                self.turtle.right(90)
+            self.turtle.forward(dist)
+            self.steps += 1
+        return self
+
+    def move2(self, steps: int):
+        """Moving the turtle of the game piece
+
+        Args:
+            steps (int): amount of steps the game piece goes
+
+        Returns:
+            GamePiece: self
+        """
+        dist = SIZES[self.board_size]
+        for _ in range(steps):
+            x_pos, y_pos = self.get_pos()
+            if has_to_turn_left(x_pos, y_pos, self.board_size):
+                self.turtle.left(90)
+            if (has_to_turn_right(x_pos, y_pos, self.board_size)
+                or (self.get_pos() == vertex_fore_goal(self.board_size)[self.color])):
                 self.turtle.right(90)
             self.turtle.forward(dist)
             self.steps += 1
@@ -89,7 +116,7 @@ class GamePiece:
         Returns:
             GamePiece: self
         """
-        self.turtle.goto(STARTING_VERTICES(self.board_size)[self.color])
+        self.turtle.goto(starting_vertices(self.board_size)[self.color])
         return self
 
     def reset(self):
@@ -103,23 +130,23 @@ class GamePiece:
         self.turtle.seth(HOME_ANGLES[self.color])
         return self
 
-    def get_future_pos(self, steps: int) -> tuple[float]:
+    def get_future_pos(self, steps: int) -> tuple[float, float]:
         """Calculates the furure position of the game piece's turtle
 
         Args:
             steps (int): amount of steps the game piece goes
 
         Returns:
-            tuple[float]: future position of the turtle
+            tuple[float, float]: future position of the turtle
         """
         dist = SIZES[self.board_size]
         future_pos = list(self.get_pos())
         future_heading = self.turtle.heading()
         for _ in range(steps):
-            if tuple(future_pos) in VERTICES_FOR_LEFT_TURN(self.board_size):
+            if tuple(future_pos) in vertices_for_left_turn(self.board_size):
                 future_heading = (future_heading + 90) % 360
-            if (tuple(future_pos) in VERTICES_FOR_RIGHT_TURN(self.board_size)
-                    or tuple(future_pos) == VERTEX_FORE_GOAL(self.board_size)[self.color]):
+            if (tuple(future_pos) in vertices_for_right_turn(self.board_size)
+                    or tuple(future_pos) == vertex_fore_goal(self.board_size)[self.color]):
                 future_heading = (future_heading - 90) % 360
 
             if future_heading == 0:
@@ -136,7 +163,7 @@ class GamePiece:
         """Getter for the turtle's position
 
         Returns:
-            tuple: turtle's position (x, y)
+            tuple[float, float]: turtle's position (x, y)
         """
         return convert_Vec2D_to_tuple(self.turtle.pos())
 
@@ -149,7 +176,7 @@ class GamePiece:
         Returns:
             bool: true if game piece is on field
         """
-        return self.get_pos() not in HOME_POSITIONS(self.board_size)[self.color]
+        return self.get_pos() not in home_positions(self.board_size)[self.color]
         # return self.get_pos() != self.home_position
 
     def is_done_(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool:
@@ -159,7 +186,8 @@ class GamePiece:
         and a game piece on it shouldn't move anymore
 
         Args:
-            occupied_goal_fields (dict[tuple[float], bool]): dict of goal fields and if they are occupied
+            occupied_goal_fields (dict[tuple[float], bool]): dict of goal fields
+                                                             and if they are occupied
 
         Returns:
             bool: true if the game piece shouldn't move anymore
@@ -174,7 +202,17 @@ class GamePiece:
         Returns:
             bool: true if game piece is somewhere on the goal positions
         """
-        return self.get_pos() in GOAL_POSITIONS(self.board_size)[self.color]
+        return self.get_pos() in goal_positions(self.board_size)[self.color]
+
+    def is_in_goal2(self) -> bool:
+        """Check method if game piece is in goal
+
+        Returns:
+            bool: true if game piece is somewhere on the goal positions
+        """
+        dist = SIZES[self.board_size]
+        x_pos, y_pos = self.get_pos()
+        return (x_pos % dist == 0 and y_pos == 0) or (x_pos == 0 and y_pos % dist == 0)
 
     def where_in_goal_index(self) -> int:
         """Getting the goal position of a game piece per index
@@ -187,7 +225,7 @@ class GamePiece:
             int: the index of the goal position
         """
         if self.is_in_goal():
-            for idx, pos in enumerate(GOAL_POSITIONS(self.board_size)[self.color]):
+            for idx, pos in enumerate(goal_positions(self.board_size)[self.color]):
                 if pos == self.get_pos():
                     return idx
         return -1

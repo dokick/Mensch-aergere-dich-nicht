@@ -39,7 +39,7 @@ TODO:
 from random import choice
 from turtle import exitonclick
 
-from game_board import (COLORS, GOAL_POSITIONS, HOME_ANGLES, HOME_POSITIONS,
+from game_board import (COLORS, goal_positions, HOME_ANGLES, home_positions,
                         draw_winner_on_board, game_board)
 from game_piece import GamePiece
 from player import Player
@@ -133,6 +133,7 @@ def has_one_player_won(size: str, players: list[Player]) -> Player | None:
     """Checks if a player has won yet
 
     Args:
+        size (str): size of game board. look into SIZES for sizes
         players (list[Player]): information of all players
 
     Returns:
@@ -141,7 +142,7 @@ def has_one_player_won(size: str, players: list[Player]) -> Player | None:
     for player in players:
         has_player_won = True
         for game_piece in player.game_pieces:
-            if game_piece.get_pos() not in GOAL_POSITIONS(size)[player.color]:
+            if game_piece.get_pos() not in goal_positions(size)[player.color]:
                 has_player_won = False
                 break
         if has_player_won:
@@ -154,7 +155,11 @@ def has_one_player_won(size: str, players: list[Player]) -> Player | None:
 
 
 def draw_winner(player: Player):
-    """Draws winner by passing on the color of the player"""
+    """Draws winner by passing on the color of the player
+
+    Args:
+        player (Player): player that won
+    """
     draw_winner_on_board(player.color)
 
 
@@ -162,6 +167,7 @@ def setup(size: str, amount_of_players: int) -> tuple[list[Player], Player]:
     """A setup function so the game can start with initial values
 
     Args:
+        size (str): size of game board. look into SIZES for sizes
         amount_of_players (int): the amount of players in the game (not implemented yet)
 
     Returns:
@@ -171,7 +177,7 @@ def setup(size: str, amount_of_players: int) -> tuple[list[Player], Player]:
     players: list[Player] = []
     for color in COLORS:
         players.append(Player(board_size=size, color=color, game_pieces=[GamePiece(
-            size, color, HOME_POSITIONS(size)[color][i], speed=3) for i in range(4)]))
+            size, color, home_positions(size)[color][i], speed=3) for i in range(4)]))
 
     for player, color in zip(players, COLORS):
         for game_piece in player.game_pieces:
@@ -183,7 +189,7 @@ def setup(size: str, amount_of_players: int) -> tuple[list[Player], Player]:
     return players, starting_player
 
 
-def start_game_loop(size: str = "medium", amount_of_players: int = 4):
+def start_game_loop(size: str, amount_of_players: int = 4):
     """Starts the game loop
 
     Loop works as follows:
@@ -193,7 +199,9 @@ def start_game_loop(size: str = "medium", amount_of_players: int = 4):
     - check if someone has won yet
 
     Args:
-        amount_of_players (int): the amount of players that are playing (not implemented yet)
+        size (str): size of game board. look into SIZES for sizes
+        amount_of_players (int): amount of players that are playing (not implemented yet).
+                                 Defaults to 4.
     """
     players, current_player = setup(size, amount_of_players)
     index_of_current_player = players.index(current_player)
@@ -213,10 +221,14 @@ def start_game_loop(size: str = "medium", amount_of_players: int = 4):
     draw_winner(won_player)
 
 
-def start_game():
-    """Starts game"""
-    game_board()
-    start_game_loop()
+def start_game(size: str = "medium"):
+    """Starts game
+
+    Args:
+        size (str, optional): size of game board. look into SIZES for sizes. Defaults to "medium".
+    """
+    game_board(size)
+    start_game_loop(size)
     exitonclick()
 
 
@@ -225,7 +237,7 @@ def start_game():
 
 def main():
     """pylint shut up"""
-    start_game()
+    start_game("small")
 
 
 if __name__ == "__main__":
