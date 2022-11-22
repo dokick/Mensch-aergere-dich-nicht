@@ -39,6 +39,7 @@ Functions:
                                             tuple[float, float]]]
 """
 
+from typing import Union
 from turtle import (back, begin_fill, circle, end_fill, exitonclick, fillcolor,
                     forward, goto, hideturtle, left, pencolor, pendown,
                     pensize, penup, right, seth, shape, speed, write)
@@ -73,10 +74,10 @@ MATRIX: tuple[tuple[int, int],
               tuple[int, int]] = ((-1, 1), (1, 1), (1, -1), (-1, -1))
 
 
-def create_pattern(x: float, y: float | None = None, /) -> tuple[tuple[float, float],
-                                                                 tuple[float, float],
-                                                                 tuple[float, float],
-                                                                 tuple[float, float]]:
+def create_pattern(x: float, y: Union[float, None] = None, /) -> tuple[tuple[float, float],
+                                                                       tuple[float, float],
+                                                                       tuple[float, float],
+                                                                       tuple[float, float]]:
     """Creates tuple with the following pattern
     ((-x, y), (y, x), (x, -y), (-y, -x))
 
@@ -100,7 +101,7 @@ def create_pattern(x: float, y: float | None = None, /) -> tuple[tuple[float, fl
     return tuple(tmp)
 
 
-def create_pattern_as_list(x: float, y: float | None = None, /) -> list[list[float]]:
+def create_pattern_as_list(x: float, y: Union[float, None] = None, /) -> list[list[float]]:
     """Creates list with the following pattern
     [[-x, y], [y, x], [x, -y], [-y, -x]]
 
@@ -293,7 +294,7 @@ def has_to_turn_left(x: float, y: float, /, size: str) -> bool:
     return x == dist and y == dist
 
 
-def has_to_turn_right(x: float, y: float, /, size: str) -> bool:
+def has_to_turn_right(x: float, y: float, /, size: str, color: str) -> bool:
     """Checks if game piece has to turn right
 
     Args:
@@ -305,9 +306,11 @@ def has_to_turn_right(x: float, y: float, /, size: str) -> bool:
         bool: true if game piece has to turn right on vertex (x, y)
     """
     dist = SIZES[size]
-    x, y = abs(x), abs(y)
-    # TODO: Missing pos infront of goal
-    return (x == dist * 5 and y == dist) or (x == dist and y == dist * 5)
+    color_factors_dict = dict(zip(COLORS, create_pattern(5, 0)))
+    factor_x, factor_y = color_factors_dict[color]
+    return ((abs(x) == dist * 5 and abs(y) == dist)
+            or (abs(x) == dist and abs(y) == dist * 5)
+            or (x == factor_x*dist and y == factor_y*dist))
 
 
 def vertices_for_left_turn(size: str) -> tuple[tuple[float, float],
@@ -525,5 +528,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print(two_vertices_fore_goal("medium"))
     main()

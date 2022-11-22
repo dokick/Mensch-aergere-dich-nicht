@@ -38,6 +38,7 @@ TODO:
 
 from random import choice
 from turtle import exitonclick
+from typing import Union
 
 from game_board import (COLORS, goal_positions, HOME_ANGLES, home_positions,
                         draw_winner_on_board, game_board)
@@ -49,7 +50,7 @@ from tools import dice
 
 
 def did_player_hit_other_players(*, game_piece_being_checked: GamePiece,
-                                 players: list[Player]) -> GamePiece | None:
+                                 players: list[Player]) -> Union[GamePiece, None]:
     """Helper function for the game mechanic that players can hit other players
 
     Args:
@@ -129,7 +130,7 @@ def has_player_playable_game_pieces_on_board(current_player: Player) -> bool:
     return False
 
 
-def has_one_player_won(size: str, players: list[Player]) -> Player | None:
+def has_one_player_won(size: str, players: list[Player]) -> Union[Player, None]:
     """Checks if a player has won yet
 
     Args:

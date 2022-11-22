@@ -103,7 +103,7 @@ class GamePiece:
             x_pos, y_pos = self.get_pos()
             if has_to_turn_left(x_pos, y_pos, self.board_size):
                 self.turtle.left(90)
-            if (has_to_turn_right(x_pos, y_pos, self.board_size)
+            if (has_to_turn_right(x_pos, y_pos, self.board_size, self.color)
                 or (self.get_pos() == vertex_fore_goal(self.board_size)[self.color])):
                 self.turtle.right(90)
             self.turtle.forward(dist)

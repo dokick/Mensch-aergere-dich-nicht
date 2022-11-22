@@ -2,21 +2,12 @@
 This module is just a collection of useful functions.
 
 Functions:
-    dice() -> int
     convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float, float]
+    dice() -> int
 """
 
 from random import randint
 from turtle import Vec2D
-
-
-def dice() -> int:
-    """Simulates rolling a dice
-
-    Returns:
-        int: Random integer betweeen 1 and 6
-    """
-    return randint(1, 6)
 
 
 def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float, float]:
@@ -34,6 +25,15 @@ def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float, float]:
         tuple[float, float]: turtle's position (x, y)
     """
     return tuple((round(i, 2) for i in pos))
+
+
+def dice() -> int:
+    """Simulates rolling a dice
+
+    Returns:
+        int: Random integer betweeen 1 and 6
+    """
+    return randint(1, 6)
 
 
 if __name__ == "__main__":
