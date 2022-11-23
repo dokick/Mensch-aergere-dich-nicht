@@ -10,6 +10,7 @@ from random import randint
 from turtle import Vec2D
 
 
+# pylint: disable-next=invalid-name
 def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float, float]:
     """Converting a Vec2D Vector from turtle
 
@@ -37,5 +38,6 @@ def dice() -> int:
 
 
 if __name__ == "__main__":
+    # pylint: disable-next=expression-not-assigned
     print("Test passed") if dice() in [
         1, 2, 3, 4, 5, 6] else print("Test failed")

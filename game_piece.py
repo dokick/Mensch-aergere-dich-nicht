@@ -1,6 +1,7 @@
 """
 This module represents a game piece
 """
+# pylint: disable-next=no-name-in-module
 from turtle import Screen, Turtle, exitonclick
 
 from game_board import (GAME_PIECE_COLORS, HOME_ANGLES, SIZES, goal_factors, goal_positions,

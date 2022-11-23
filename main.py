@@ -164,6 +164,7 @@ def draw_winner(player: Player):
     draw_winner_on_board(player.color)
 
 
+# pylint: disable-next=unused-argument
 def setup(size: str, amount_of_players: int) -> tuple[list[Player], Player]:
     """A setup function so the game can start with initial values
 
