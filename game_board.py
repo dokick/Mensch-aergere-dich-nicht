@@ -39,10 +39,10 @@ Functions:
                                             tuple[float, float]]]
 """
 
-from typing import Union
 from turtle import (back, begin_fill, circle, end_fill, exitonclick, fillcolor,
                     forward, goto, hideturtle, left, pencolor, pendown,
                     pensize, penup, right, seth, shape, speed, write)
+from typing import Union
 
 SIZES: dict[str, int] = {"x-small": 48,
                          "small": 64,
@@ -54,17 +54,12 @@ SIZES: dict[str, int] = {"x-small": 48,
 COLORS = ("yellow", "green", "red", "black")
 """Order of colors beginning in the top left corner and then going clockwise:
 yellow, green, red, black"""
-GAME_PIECE_COLORS: dict[str, tuple[int, int, int]] = {color: rgb
-                                                      for color, rgb
-                                                      in zip(COLORS,
-                                                             ((255, 215, 0),
-                                                              (15, 200, 11),
-                                                              (176, 0, 0),
-                                                              (64, 64, 64)))}
+GAME_PIECE_COLORS: dict[str, tuple[int, int, int]] = dict(zip(COLORS, ((255, 215, 0),
+                                                                       (15, 200, 11),
+                                                                       (176, 0, 0),
+                                                                       (64, 64, 64))))
 
-HOME_ANGLES = {color: angle
-               for color, angle
-               in zip(COLORS, (90, 0, 270, 180))}
+HOME_ANGLES = dict(zip(COLORS, (90, 0, 270, 180)))
 """Angles accessed by color so at the beginning game pieces
 look in the right direction (easier setup)"""
 
@@ -82,14 +77,14 @@ def create_pattern(x: float, y: Union[float, None] = None, /) -> tuple[tuple[flo
     ((-x, y), (y, x), (x, -y), (-y, -x))
 
     Args:
-        x (float): x coordinate
-        y (float | None): y coordinate, if None, y = x
+        x (float): first number
+        y (Union[float, None], optional): second number. Defaults to None.
 
     Returns:
         tuple[tuple[float, float],
               tuple[float, float],
               tuple[float, float],
-              tuple[float, float]]: pos pattern
+              tuple[float, float]]: number pattern
     """
     if y is None:
         y = x
@@ -106,11 +101,11 @@ def create_pattern_as_list(x: float, y: Union[float, None] = None, /) -> list[li
     [[-x, y], [y, x], [x, -y], [-y, -x]]
 
     Args:
-        x (float): x coordinate
-        y (float | None): y coordinate, if None, y = x
+        x (float): first number
+        y (Union[float, None], optional): second number. Defaults to None.
 
     Returns:
-        list[list[float]]: pos pattern
+        list[list[float]]: number pattern
     """
     if y is None:
         y = x
@@ -301,6 +296,7 @@ def has_to_turn_right(x: float, y: float, /, size: str, color: str) -> bool:
         x (float): x pos
         y (float): y pos
         size (str): size of game board. look into SIZES for sizes
+        color (str): color of game piece
 
     Returns:
         bool: true if game piece has to turn right on vertex (x, y)
@@ -330,7 +326,6 @@ def vertices_for_left_turn(size: str) -> tuple[tuple[float, float],
     """
     dist = SIZES[size]
     return create_pattern(dist)
-# VERTICES_FOR_LEFT_TURN = create_pattern(STEP_SIZE)
 
 
 def vertices_for_right_turn(size: str) -> tuple[tuple[float, float],
@@ -358,8 +353,6 @@ def vertices_for_right_turn(size: str) -> tuple[tuple[float, float],
     """
     dist = SIZES[size]
     return (create_pattern(dist, dist*5) + create_pattern(dist*5, dist))
-# VERTICES_FOR_RIGHT_TURN = (create_pattern(STEP_SIZE, STEP_SIZE*5)
-#                            + create_pattern(STEP_SIZE*5, STEP_SIZE))
 
 
 def starting_vertices(size: str) -> dict[str, tuple[float, float]]:
@@ -372,12 +365,7 @@ def starting_vertices(size: str) -> dict[str, tuple[float, float]]:
         dict[str, tuple[float, float]]: vertices for starting point
     """
     dist = SIZES[size]
-    return {color: pos
-            for color, pos
-            in zip(COLORS, create_pattern(dist*5, dist))}
-# STARTING_VERTICES = {color: pos
-#                      for color, pos
-#                      in zip(COLORS, create_pattern(STEP_SIZE*5, STEP_SIZE))}
+    return dict(zip(COLORS, create_pattern(dist * 5, dist)))
 
 
 def vertex_fore_goal(size: str) -> dict[str, tuple[float, float]]:
@@ -391,12 +379,7 @@ def vertex_fore_goal(size: str) -> dict[str, tuple[float, float]]:
         dict[str, tuple[float, float]]: vertex infront of goal pos
     """
     dist = SIZES[size]
-    return {color: pos
-            for color, pos
-            in zip(COLORS, create_pattern(dist*5, 0))}
-# VERTEX_FORE_GOAL = {color: pos
-#                     for color, pos
-#                     in zip(COLORS, create_pattern(STEP_SIZE*5, 0))}
+    return dict(zip(COLORS, create_pattern(dist*5, 0)))
 
 
 def two_vertices_fore_goal(size: str) -> dict[str,
@@ -423,28 +406,11 @@ def two_vertices_fore_goal(size: str) -> dict[str,
                                   tuple[float, float],
                                   tuple[float, float],
                                   tuple[float, float]] = tuple(rev_vert_4_goal)
-    # print(swapped_vert_fore_goal)
     return {color: (one_fore_goal, two_fore_goal)
             for color, one_fore_goal, two_fore_goal
             in zip(COLORS,
                    create_pattern(dist*5, 0),
                    swapped_vert_fore_goal)}
-# dist = SIZES[size]
-# rev_vert_4_goal = list(reversed(create_pattern_as_list(dist*5, dist)))
-# for idx, val in enumerate(rev_vert_4_goal):
-#     rev_vert_4_goal[idx][0], rev_vert_4_goal[idx][1] = rev_vert_4_goal[idx][1],
-#                                                        rev_vert_4_goal[idx][0]
-#     rev_vert_4_goal[idx] = tuple(rev_vert_4_goal[idx])
-#
-# swapped_vert_fore_goal: tuple[tuple[float, float],
-#                               tuple[float, float],
-#                               tuple[float, float],
-#                               tuple[float, float]] = tuple(rev_vert_4_goal)
-# TWO_VERTICES_FORE_GOAL = {color: (one_fore_goal, two_fore_goal)
-#                           for color, one_fore_goal, two_fore_goal
-#                           in zip(COLORS,
-#                                  create_pattern(dist*5, 0),
-#                                  swapped_vert_fore_goal)}
 
 
 def goal_positions(size: str) -> dict[str,
@@ -453,6 +419,8 @@ def goal_positions(size: str) -> dict[str,
                                             tuple[float, float],
                                             tuple[float, float]]]:
     """Vertex goal positions accessed by color
+
+    Order's inside out
 
     Args:
         size (str): size of game board. look into SIZES for sizes
@@ -472,14 +440,18 @@ def goal_positions(size: str) -> dict[str,
                    create_pattern(dist*2, 0),
                    create_pattern(dist*3, 0),
                    create_pattern(dist*4, 0))}
-# dist = SIZES[size]
-# GOAL_POSITIONS = {color: (inner, second, third, outer)
-#                   for color, inner, second, third, outer
-#                   in zip(COLORS,
-#                          create_pattern(dist, 0),
-#                          create_pattern(dist*2, 0),
-#                          create_pattern(dist*3, 0),
-#                          create_pattern(dist*4, 0))}
+
+
+def goal_factors(color: str) -> tuple[float, float]:
+    """Goal factors for calculating the goal pos
+
+    Args:
+        color (str): color of game piece
+
+    Returns:
+        tuple[float, float]: factors
+    """
+    return dict(zip(COLORS, create_pattern(1, 0)))[color]
 
 
 def home_positions(size: str) -> dict[str,
@@ -507,20 +479,10 @@ def home_positions(size: str) -> dict[str,
                    create_pattern(dist*4, dist*5 - dist//8),
                    create_pattern(dist*5 - dist//8, dist*4),
                    create_pattern(dist*4))}
-# dist = SIZES[size]
-# HOME_POSITIONS = {color: (fir, sec, thi, fou)
-#                   for color, fir, sec, thi, fou
-#                   in zip(COLORS,
-#                          create_pattern(dist*5 - dist//8),
-#                          create_pattern(dist*4, dist*5 - dist//8),
-#                          create_pattern(dist*5 - dist//8, dist*4),
-#                          create_pattern(dist*4))}
 
 
 def main():
     """For testing and debugging purposes"""
-    # print(HOME_POSITIONS("small"))
-    # print(TWO_VERTICES_FORE_GOAL("medium"))
     game_board("large")
     for color in COLORS:
         draw_winner_on_board(color)
