@@ -38,10 +38,10 @@ TODO:
 
 from random import choice
 from turtle import exitonclick
-from typing import Union
+from typing import Optional
 
-from game_board import (COLORS, goal_positions, HOME_ANGLES, home_positions,
-                        draw_winner_on_board, game_board)
+from game_board import (COLORS, HOME_ANGLES, draw_winner_on_board, game_board,
+                        goal_positions, home_positions)
 from game_piece import GamePiece
 from player import Player
 from tools import dice
@@ -50,7 +50,7 @@ from tools import dice
 
 
 def did_player_hit_other_players(*, game_piece_being_checked: GamePiece,
-                                 players: list[Player]) -> Union[GamePiece, None]:
+                                 players: list[Player]) -> Optional[GamePiece]:
     """Helper function for the game mechanic that players can hit other players
 
     Args:
@@ -130,7 +130,7 @@ def has_player_playable_game_pieces_on_board(current_player: Player) -> bool:
     return False
 
 
-def has_one_player_won(size: str, players: list[Player]) -> Union[Player, None]:
+def has_one_player_won(size: str, players: list[Player]) -> Optional[Player]:
     """Checks if a player has won yet
 
     Args:
@@ -202,8 +202,8 @@ def start_game_loop(size: str, amount_of_players: int = 4):
 
     Args:
         size (str): size of game board. look into SIZES for sizes
-        amount_of_players (int): amount of players that are playing (not implemented yet).
-                                 Defaults to 4.
+        amount_of_players (int, optional): amount of players that are playing (not implemented yet).
+                                           Defaults to 4.
     """
     players, current_player = setup(size, amount_of_players)
     index_of_current_player = players.index(current_player)

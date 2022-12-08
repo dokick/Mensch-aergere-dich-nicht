@@ -5,7 +5,8 @@ Classes:
     Player
 """
 
-from typing import Union
+from typing import Optional
+
 from game_board import goal_positions, home_positions, two_vertices_fore_goal
 from game_piece import GamePiece
 
@@ -123,7 +124,7 @@ class Player:
 
         return final_game_pieces
 
-    def pick_game_piece(self, steps: int) -> Union[GamePiece, None]:
+    def pick_game_piece(self, steps: int) -> Optional[GamePiece]:
         """Gets all the valid game pieces and picks a final game piece
 
         Deciding mechanisms can be implemented here
@@ -150,7 +151,7 @@ class Player:
                 pick = game_piece
         return pick
 
-    def move(self, steps: int) -> Union[GamePiece, None]:
+    def move(self, steps: int) -> Optional[GamePiece]:
         """Makes the move for a player
 
         First is there even a game piece.

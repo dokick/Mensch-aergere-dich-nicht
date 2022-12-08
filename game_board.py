@@ -42,7 +42,7 @@ Functions:
 from turtle import (back, begin_fill, circle, end_fill, exitonclick, fillcolor,
                     forward, goto, hideturtle, left, pencolor, pendown,
                     pensize, penup, right, seth, shape, speed, write)
-from typing import Union
+from typing import Optional
 
 SIZES: dict[str, int] = {"x-small": 48,
                          "small": 64,
@@ -69,10 +69,10 @@ MATRIX: tuple[tuple[int, int],
               tuple[int, int]] = ((-1, 1), (1, 1), (1, -1), (-1, -1))
 
 
-def create_pattern(x: float, y: Union[float, None] = None, /) -> tuple[tuple[float, float],
-                                                                       tuple[float, float],
-                                                                       tuple[float, float],
-                                                                       tuple[float, float]]:
+def create_pattern(x: float, y: Optional[float] = None, /) -> tuple[tuple[float, float],
+                                                                    tuple[float, float],
+                                                                    tuple[float, float],
+                                                                    tuple[float, float]]:
     """Creates tuple with the following pattern
     ((-x, y), (y, x), (x, -y), (-y, -x))
 
@@ -96,7 +96,7 @@ def create_pattern(x: float, y: Union[float, None] = None, /) -> tuple[tuple[flo
     return tuple(tmp)
 
 
-def create_pattern_as_list(x: float, y: Union[float, None] = None, /) -> list[list[float]]:
+def create_pattern_as_list(x: float, y: Optional[float] = None, /) -> list[list[float]]:
     """Creates list with the following pattern
     [[-x, y], [y, x], [x, -y], [-y, -x]]
 
