@@ -4,9 +4,16 @@ This module represents a game piece
 # pylint: disable-next=no-name-in-module
 from turtle import Screen, Turtle, exitonclick
 
-from game_board import (GAME_PIECE_COLORS, HOME_ANGLES, SIZES, goal_factors, goal_positions,
-                        has_to_turn_left, has_to_turn_right, home_positions, starting_vertices)
-from tools import convert_Vec2D_to_tuple
+from mensch_aergere_dich_nicht.game_board import (GAME_PIECE_COLORS,
+                                                  HOME_ANGLES, SIZES,
+                                                  get_goal_factors,
+                                                  get_home_factors,
+                                                  goal_positions,
+                                                  has_to_turn_left,
+                                                  has_to_turn_right,
+                                                  home_positions,
+                                                  starting_vertices)
+from mensch_aergere_dich_nicht.tools import convert_Vec2D_to_tuple
 
 
 class GamePiece:
@@ -171,7 +178,7 @@ class GamePiece:
             return occupied_goal_fields[self.get_pos()]
         return False
 
-    def is_in_goal(self) -> bool:
+    def in_goal(self) -> bool:
         """Check method if game piece is in goal
 
         Returns:
@@ -179,7 +186,7 @@ class GamePiece:
         """
         return self.get_pos() in goal_positions(self.board_size)[self.color]
 
-    def is_in_goal2(self) -> bool:
+    def in_goal2(self) -> bool:
         """Check method if game piece is in goal
 
         Returns:
@@ -187,7 +194,7 @@ class GamePiece:
         """
         dist = SIZES[self.board_size]
         x_pos, y_pos = self.get_pos()
-        factor_x, factor_y = goal_factors(self.color)
+        factor_x, factor_y = get_goal_factors(self.color)
         x_set = {factor_x*i for i in range(1, 5)}
         y_set = {factor_y*i for i in range(1, 5)}
         return x_pos / dist in x_set and y_pos / dist in y_set
@@ -202,11 +209,22 @@ class GamePiece:
         Returns:
             int: the index of the goal position
         """
-        if self.is_in_goal():
+        if self.in_goal():
             for idx, pos in enumerate(goal_positions(self.board_size)[self.color]):
                 if pos == self.get_pos():
                     return idx
         return -1
+
+    def at_home(self) -> bool:
+        """Check method if game piece at home
+
+        Returns:
+            bool: true if at home
+        """
+        dist = SIZES[self.board_size]
+        factor_x, factor_y = get_home_factors(self.color)
+        # TODO: WIP
+        return False
 
 
 def main():

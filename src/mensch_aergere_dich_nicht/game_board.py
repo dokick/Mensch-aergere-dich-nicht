@@ -39,6 +39,7 @@ Functions:
                                             tuple[float, float]]]
 """
 
+# import turtle as tt
 from turtle import (back, begin_fill, circle, end_fill, exitonclick, fillcolor,
                     forward, goto, hideturtle, left, pencolor, pendown,
                     pensize, penup, right, seth, shape, speed, write)
@@ -70,9 +71,9 @@ MATRIX: tuple[tuple[int, int],
 
 
 def create_pattern(x: float, y: Optional[float] = None, /) -> tuple[tuple[float, float],
-                                                                    tuple[float, float],
-                                                                    tuple[float, float],
-                                                                    tuple[float, float]]:
+                                                                       tuple[float, float],
+                                                                       tuple[float, float],
+                                                                       tuple[float, float]]:
     """Creates tuple with the following pattern
     ((-x, y), (y, x), (x, -y), (-y, -x))
 
@@ -442,7 +443,7 @@ def goal_positions(size: str) -> dict[str,
                    create_pattern(dist*4, 0))}
 
 
-def goal_factors(color: str) -> tuple[float, float]:
+def get_goal_factors(color: str) -> tuple[float, float]:
     """Goal factors for calculating the goal pos
 
     Args:
@@ -479,6 +480,18 @@ def home_positions(size: str) -> dict[str,
                    create_pattern(dist*4, dist*5 - dist//8),
                    create_pattern(dist*5 - dist//8, dist*4),
                    create_pattern(dist*4))}
+
+
+def get_home_factors(color: str) -> tuple[float, float]:
+    """Home factors for calculating home pos
+
+    Args:
+        color (str): color of game piece or player
+
+    Returns:
+        tuple[float, float]: factors
+    """
+    return dict(zip(COLORS, create_pattern(1)))[color]
 
 
 def main():

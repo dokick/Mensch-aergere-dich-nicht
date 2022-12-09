@@ -31,43 +31,46 @@ TODO:
 - Spielfiguren können das Ziel überspringen
 - Spielfiguren derselben Farbe übereinander im Ziel
 - Wenn eine Spielfigur durch rauskommen eine andere Farbe rausschmeißen müsste,
-  passiert es nicht
+  passiert es nicht (TODO changes implemented, needs to be tested)
 - Priorität, dass bei geringer Würfelzahl die Spielfiguren im Ziel
   benutzt werden, funktioniert nicht
 """
 
 from random import choice
-from turtle import exitonclick
-from typing import Optional
+from turtle import exitonclick  # pylint: disable=no-name-in-module
+from typing import Optional, Union
 
-from game_board import (COLORS, HOME_ANGLES, draw_winner_on_board, game_board,
-                        goal_positions, home_positions)
-from game_piece import GamePiece
-from player import Player
-from tools import dice
+from mensch_aergere_dich_nicht.game_board import (COLORS, HOME_ANGLES,
+                                                  draw_winner_on_board,
+                                                  game_board, goal_positions,
+                                                  home_positions)
+from mensch_aergere_dich_nicht.game_piece import GamePiece
+from mensch_aergere_dich_nicht.player import Player
+from mensch_aergere_dich_nicht.tools import dice
 
 ############################## Start of game mechanics ##############################
 
 
 def did_player_hit_other_players(*, game_piece_being_checked: GamePiece,
-                                 players: list[Player]) -> Optional[GamePiece]:
+                                 players: list[Player]) -> None:
     """Helper function for the game mechanic that players can hit other players
 
-    Args:
-        game_piece_being_checked (GamePiece): the game piece that made a move
-        players (list[Player]): information of all players
+    If other player got hit, game piece gets reset
 
-    Returns:
-        GamePiece | None: Returns game piece that got hit by another player
-                          or None if no one got hit
+    Args:
+        game_piece_being_checked (GamePiece): game piece that made a move
+        players (list[Player]): information of all players
     """
+    if not game_piece_being_checked:
+        return
+
+    current_pos = game_piece_being_checked.get_pos()
     for player in players:
         if player.color == game_piece_being_checked.color:
             continue
         for game_piece in player.game_pieces:
-            if game_piece.get_pos() == game_piece_being_checked.get_pos():
-                return game_piece
-    return None
+            if game_piece.get_pos() == current_pos:
+                game_piece.reset()
 
 
 def get_permission() -> bool:
@@ -86,28 +89,24 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
     """Simulates and also handles the move in the game
 
     If a player has no game pieces to play with,
-    the player has to get a new game piece on the board
+    the player has to get a new game piece on the board.
     Otherwise the move gets validated and then the player moves
 
     Args:
         current_player (Player): the player that has the current turn
         players (list[Player]): information of all players
     """
-    permission = False
-    has_gp_on_board = has_player_playable_game_pieces_on_board(current_player)
-    if not has_gp_on_board:
-        permission = get_permission()
-        if permission:
-            current_player.place_game_piece_on_start()
+    permission = get_permission()
 
-    if has_gp_on_board or permission:
+    if not has_player_playable_game_pieces_on_board(current_player) and permission:
+        current_game_piece = current_player.place_game_piece_on_start()
+        did_player_hit_other_players(game_piece_being_checked=current_game_piece,
+                                     players=players)
+
+    if has_player_playable_game_pieces_on_board(current_player):
         current_game_piece = current_player.move(dice())
-
-        if current_game_piece:
-            kicked_out_game_piece = did_player_hit_other_players(
-                game_piece_being_checked=current_game_piece, players=players)
-            if kicked_out_game_piece:
-                kicked_out_game_piece.reset()
+        did_player_hit_other_players(game_piece_being_checked=current_game_piece,
+                                     players=players)
 
 
 ############################## End of game mechanics ##############################
@@ -173,8 +172,8 @@ def setup(size: str, amount_of_players: int) -> tuple[list[Player], Player]:
         amount_of_players (int): the amount of players in the game (not implemented yet)
 
     Returns:
-        tuple: first a tuple with all the players,
-               second the player that starts the game
+        tuple[list[Player], Player]: first a tuple with all the players,
+                                     second the player that starts the game
     """
     players: list[Player] = []
     for color in COLORS:
@@ -207,7 +206,7 @@ def start_game_loop(size: str, amount_of_players: int = 4):
     """
     players, current_player = setup(size, amount_of_players)
     index_of_current_player = players.index(current_player)
-    won_player = None
+    won_player: Optional[Player] = None
     iterations = 0
 
     while not won_player:
