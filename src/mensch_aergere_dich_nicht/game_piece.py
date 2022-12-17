@@ -4,16 +4,11 @@ This module represents a game piece
 # pylint: disable-next=no-name-in-module
 from turtle import Screen, Turtle, exitonclick
 
-from mensch_aergere_dich_nicht.game_board import (GAME_PIECE_COLORS,
-                                                  HOME_ANGLES, SIZES,
-                                                  get_goal_factors,
-                                                  get_home_factors,
-                                                  goal_positions,
-                                                  has_to_turn_left,
-                                                  has_to_turn_right,
-                                                  home_positions,
-                                                  starting_vertices)
-from mensch_aergere_dich_nicht.tools import convert_Vec2D_to_tuple
+from game_board import (GAME_PIECE_COLORS, HOME_ANGLES, SIZES,
+                        get_goal_factors, get_home_factors, goal_positions,
+                        has_to_turn_left, has_to_turn_right, home_positions,
+                        starting_vertices)
+from tools import convert_Vec2D_to_tuple
 
 
 class GamePiece:
@@ -200,16 +195,19 @@ class GamePiece:
         return x_pos / dist in x_set and y_pos / dist in y_set
 
     def where_in_goal_index(self) -> int:
-        """Getting the goal position of a game piece per index
+        """Getting the goal position of a game piece via index
 
         0 is the most inner position.
         3 the most outer position.
         -1 if not in goal
 
         Returns:
-            int: the index of the goal position
+            int: index of the goal position
         """
         if self.in_goal():
+            dist = SIZES[self.board_size]
+            x_pos, y_pos = self.get_pos()
+            return int(x_pos / dist) if x_pos != 0 else int(y_pos / dist)
             for idx, pos in enumerate(goal_positions(self.board_size)[self.color]):
                 if pos == self.get_pos():
                     return idx
@@ -232,11 +230,15 @@ def main():
     size = "medium"
     dist = SIZES[size]
     home_position = (-dist*5, dist)
-    game_piece = GamePiece(size, "green", home_position)
+    game_piece = GamePiece(size, "yellow", home_position)
     print(game_piece)
     print(bool(game_piece))  # True
     print(not game_piece)  # False
 
+    game_piece.turtle.goto(-80, 0)
+    print(game_piece.where_in_goal_index())
+
+    return
     game_piece.turtle.goto(home_position)
     game_piece.turtle.seth(90)
     print(game_piece.get_pos())

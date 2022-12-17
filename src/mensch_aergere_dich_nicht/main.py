@@ -38,20 +38,18 @@ TODO:
 
 from random import choice
 from turtle import exitonclick  # pylint: disable=no-name-in-module
-from typing import Optional, Union
+from typing import Optional
 
-from mensch_aergere_dich_nicht.game_board import (COLORS, HOME_ANGLES,
-                                                  draw_winner_on_board,
-                                                  game_board, goal_positions,
-                                                  home_positions)
-from mensch_aergere_dich_nicht.game_piece import GamePiece
-from mensch_aergere_dich_nicht.player import Player
-from mensch_aergere_dich_nicht.tools import dice
+from game_board import (COLORS, HOME_ANGLES, draw_winner_on_board, game_board,
+                        goal_positions, home_positions)
+from game_piece import GamePiece
+from player import Player
+from tools import dice
 
 ############################## Start of game mechanics ##############################
 
 
-def did_player_hit_other_players(*, game_piece_being_checked: GamePiece,
+def did_player_hit_other_players(*, game_piece_being_checked: Optional[GamePiece],
                                  players: list[Player]) -> None:
     """Helper function for the game mechanic that players can hit other players
 
@@ -218,8 +216,9 @@ def start_game_loop(size: str, amount_of_players: int = 4):
         if iterations == 300:
             break
     print(f"{iterations =}")
-    print(f"{won_player.color} has won the game")
-    draw_winner(won_player)
+    if isinstance(won_player, Player):
+        print(f"{won_player.color} has won the game")
+        draw_winner(won_player)
 
 
 def start_game(size: str = "medium"):

@@ -3,11 +3,11 @@ This module draws the game board
 and generates all necessary position coordinates inside of dicts or tuples
 
 Functions:
-    create_pattern(x: float, y: float | None = None) -> tuple[tuple[float, float],
-                                                              tuple[float, float],
-                                                              tuple[float, float],
-                                                              tuple[float, float]]
-    create_pattern_as_list(x: float, y: float | None = None) -> list[list[float]]
+    create_pattern(x: float, y: Optional[float] = None) -> tuple[tuple[float, float],
+                                                                 tuple[float, float],
+                                                                 tuple[float, float],
+                                                                 tuple[float, float]]
+    create_pattern_as_list(x: float, y: Optional[float] = None) -> list[list[float]]
     game_board(size: str = "medium") -> None
     draw_winner_on_board(color: str)
     vertices_for_left_turn(size: str) -> tuple[tuple[float, float],
@@ -39,7 +39,6 @@ Functions:
                                             tuple[float, float]]]
 """
 
-# import turtle as tt
 from turtle import (back, begin_fill, circle, end_fill, exitonclick, fillcolor,
                     forward, goto, hideturtle, left, pencolor, pendown,
                     pensize, penup, right, seth, shape, speed, write)
@@ -71,15 +70,15 @@ MATRIX: tuple[tuple[int, int],
 
 
 def create_pattern(x: float, y: Optional[float] = None, /) -> tuple[tuple[float, float],
-                                                                       tuple[float, float],
-                                                                       tuple[float, float],
-                                                                       tuple[float, float]]:
+                                                                    tuple[float, float],
+                                                                    tuple[float, float],
+                                                                    tuple[float, float]]:
     """Creates tuple with the following pattern
     ((-x, y), (y, x), (x, -y), (-y, -x))
 
     Args:
         x (float): first number
-        y (Union[float, None], optional): second number. Defaults to None.
+        y (Optional[float], optional): second number. Defaults to None.
 
     Returns:
         tuple[tuple[float, float],
@@ -103,7 +102,7 @@ def create_pattern_as_list(x: float, y: Optional[float] = None, /) -> list[list[
 
     Args:
         x (float): first number
-        y (Union[float, None], optional): second number. Defaults to None.
+        y (Optional[float], optional): second number. Defaults to None.
 
     Returns:
         list[list[float]]: number pattern
@@ -140,12 +139,12 @@ def game_board(size: str = "medium") -> None:
         forward(dist//2)
         right(90)
 
-    shape('turtle')
+    shape("turtle")
     speed(0)
 
     # background
-    fillcolor('#fdeb95')
-    pencolor('red')
+    fillcolor("#fdeb95")
+    pencolor("red")
     pen_width = 20
     pensize(pen_width)
     penup()
@@ -156,7 +155,7 @@ def game_board(size: str = "medium") -> None:
     for pos in create_pattern(outer_outline):
         goto(pos)
     end_fill()
-    pencolor('black')
+    pencolor("black")
     pensize(4)
     penup()
     inner_outline = dist*5 + dist//4 + 10
@@ -169,7 +168,7 @@ def game_board(size: str = "medium") -> None:
     # game fields
     goto(-(dist*5 + dist//4), dist)
     seth(270)
-    fillcolor('white')
+    fillcolor("white")
     for i in range(4):
         for _ in range(2):
             pendown()
@@ -243,16 +242,16 @@ def game_board(size: str = "medium") -> None:
             forward(dist)
             right(90)
 
-    school = 'Blackadder ITC'
-    # home = 'AR DECODE'
+    school = "Blackadder ITC"
+    # home = "AR DECODE"
     off = 0
-    for idx, (word, pos) in enumerate(zip(('Mensch', 'ärgere', 'nicht', 'dich'),
+    for idx, (word, pos) in enumerate(zip(("Mensch", "ärgere", "nicht", "dich"),
                                           create_pattern(dist*2 + dist//2))):
         if idx == 2:
             off = dist//4
         goto(pos[0], pos[1] - off)
-        write(word, move=False, align='center', font=(
-            school, dist//2 + dist//8, 'normal'))
+        write(word, move=False, align="center", font=(
+            school, dist//2 + dist//8, "normal"))
     hideturtle()
 
 

@@ -16,7 +16,7 @@ def convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float, float]:
 
     Used for getting the position of a turtle
     and not worry about compatibility issues
-    We are rounding to the last 2 digits,
+    Coordinates are rounded to the last 2 digits,
     because the turtle GUI can scramble up numbers
 
     Args:

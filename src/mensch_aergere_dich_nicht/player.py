@@ -8,10 +8,8 @@ Classes:
 from itertools import chain
 from typing import Optional
 
-from mensch_aergere_dich_nicht.game_board import (goal_positions,
-                                                  home_positions,
-                                                  two_vertices_fore_goal)
-from mensch_aergere_dich_nicht.game_piece import GamePiece
+from game_board import goal_positions, home_positions, two_vertices_fore_goal
+from game_piece import GamePiece
 
 
 class Player:
@@ -75,6 +73,7 @@ class Player:
             list[GamePiece]: list of all game pieces that qualify for
                              a valid move, if empty player has no valid moves
         """
+        # TODO: needs to be tested
         # if all game pieces are on home pos then all of them are valid
         are_home_pieces_valid = True
         for game_piece in self.game_pieces:
