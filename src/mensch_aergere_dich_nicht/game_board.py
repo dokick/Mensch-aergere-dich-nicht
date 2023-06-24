@@ -69,10 +69,10 @@ MATRIX: tuple[tuple[int, int],
               tuple[int, int]] = ((-1, 1), (1, 1), (1, -1), (-1, -1))
 
 
-def create_pattern(x: float, y: Optional[float] = None, /) -> tuple[tuple[float, float],
-                                                                    tuple[float, float],
-                                                                    tuple[float, float],
-                                                                    tuple[float, float]]:
+def clockwise_pattern(x: float, y: Optional[float] = None, /) -> tuple[tuple[float, float],
+                                                                       tuple[float, float],
+                                                                       tuple[float, float],
+                                                                       tuple[float, float]]:
     """Creates tuple with the following pattern
     ((-x, y), (y, x), (x, -y), (-y, -x))
 
@@ -96,7 +96,7 @@ def create_pattern(x: float, y: Optional[float] = None, /) -> tuple[tuple[float,
     return tuple(tmp)
 
 
-def create_pattern_as_list(x: float, y: Optional[float] = None, /) -> list[list[float]]:
+def clockwise_pattern_as_list(x: float, y: Optional[float] = None, /) -> list[list[float]]:
     """Creates list with the following pattern
     [[-x, y], [y, x], [x, -y], [-y, -x]]
 
@@ -152,7 +152,7 @@ def game_board(size: str = "medium") -> None:
     goto(-outer_outline, -outer_outline)
     pendown()
     begin_fill()
-    for pos in create_pattern(outer_outline):
+    for pos in clockwise_pattern(outer_outline):
         goto(pos)
     end_fill()
     pencolor("black")
@@ -161,7 +161,7 @@ def game_board(size: str = "medium") -> None:
     inner_outline = dist*5 + dist//4 + 10
     goto(-inner_outline, -inner_outline)
     pendown()
-    for pos in create_pattern(inner_outline):
+    for pos in clockwise_pattern(inner_outline):
         goto(pos)
     penup()
 
@@ -190,12 +190,9 @@ def game_board(size: str = "medium") -> None:
         back(dist//4)
 
     # home, start & goal fields
-    home_fields = {color: pos for color, pos in zip(COLORS, create_pattern(
-        dist*5 + dist//4, dist*5 - dist//8))}
-    start_fields = {color: pos for color, pos in zip(
-        COLORS, create_pattern(dist*5 + dist//4, dist))}
-    goal_fields = {color: pos for color, pos in zip(
-        COLORS, create_pattern(dist*4 + dist//4, 0))}
+    home_fields = dict(zip(COLORS, clockwise_pattern(dist*5 + dist//4, dist*5 - dist//8)))
+    start_fields = dict(zip(COLORS, clockwise_pattern(dist*5 + dist//4, dist)))
+    goal_fields = dict(zip(COLORS, clockwise_pattern(dist*4 + dist//4, 0)))
     hdg = 270
     for color in COLORS:
         fillcolor(color)
@@ -246,7 +243,7 @@ def game_board(size: str = "medium") -> None:
     # home = "AR DECODE"
     off = 0
     for idx, (word, pos) in enumerate(zip(("Mensch", "ärgere", "nicht", "dich"),
-                                          create_pattern(dist*2 + dist//2))):
+                                          clockwise_pattern(dist*2 + dist//2))):
         if idx == 2:
             off = dist//4
         goto(pos[0], pos[1] - off)
@@ -285,8 +282,7 @@ def has_to_turn_left(x: float, y: float, /, size: str) -> bool:
         bool: true if game piece has to turn left on vertex (x, y)
     """
     dist = SIZES[size]
-    x, y = abs(x), abs(y)
-    return x == dist and y == dist
+    return abs(x) == dist and abs(y) == dist
 
 
 def has_to_turn_right(x: float, y: float, /, size: str, color: str) -> bool:
@@ -302,7 +298,7 @@ def has_to_turn_right(x: float, y: float, /, size: str, color: str) -> bool:
         bool: true if game piece has to turn right on vertex (x, y)
     """
     dist = SIZES[size]
-    color_factors_dict = dict(zip(COLORS, create_pattern(5, 0)))
+    color_factors_dict = dict(zip(COLORS, clockwise_pattern(5, 0)))
     factor_x, factor_y = color_factors_dict[color]
     return ((abs(x) == dist * 5 and abs(y) == dist)
             or (abs(x) == dist and abs(y) == dist * 5)
@@ -365,7 +361,7 @@ def starting_vertices(size: str) -> dict[str, tuple[float, float]]:
         dict[str, tuple[float, float]]: vertices for starting point
     """
     dist = SIZES[size]
-    return dict(zip(COLORS, create_pattern(dist * 5, dist)))
+    return dict(zip(COLORS, clockwise_pattern(dist*5, dist)))
 
 
 def vertex_fore_goal(size: str) -> dict[str, tuple[float, float]]:
@@ -379,12 +375,11 @@ def vertex_fore_goal(size: str) -> dict[str, tuple[float, float]]:
         dict[str, tuple[float, float]]: vertex infront of goal pos
     """
     dist = SIZES[size]
-    return dict(zip(COLORS, create_pattern(dist*5, 0)))
+    return dict(zip(COLORS, clockwise_pattern(dist*5, 0)))
 
 
-def two_vertices_fore_goal(size: str) -> dict[str,
-                                              tuple[tuple[float, float],
-                                                    tuple[float, float]]]:
+def two_vertices_fore_goal(
+    size: str) -> dict[str, tuple[tuple[float, float], tuple[float, float]]]:
     """Vertex positions accessed by color that are two steps infront of the goal.
     Used to ensure that there are enough vertices a game piece can travel
 
@@ -397,7 +392,7 @@ def two_vertices_fore_goal(size: str) -> dict[str,
                    tuple[float, float]]]: vertices two steps infront of goal pos
     """
     dist = SIZES[size]
-    rev_vert_4_goal = list(reversed(create_pattern_as_list(dist*5, dist)))
+    rev_vert_4_goal = list(reversed(clockwise_pattern_as_list(dist*5, dist)))
     for idx, pos in enumerate(rev_vert_4_goal):
         pos[0], pos[1] = pos[1], pos[0]
         rev_vert_4_goal[idx] = tuple(rev_vert_4_goal[idx])
@@ -409,15 +404,15 @@ def two_vertices_fore_goal(size: str) -> dict[str,
     return {color: (one_fore_goal, two_fore_goal)
             for color, one_fore_goal, two_fore_goal
             in zip(COLORS,
-                   create_pattern(dist*5, 0),
+                   clockwise_pattern(dist*5, 0),
                    swapped_vert_fore_goal)}
 
 
-def goal_positions(size: str) -> dict[str,
-                                      tuple[tuple[float, float],
-                                            tuple[float, float],
-                                            tuple[float, float],
-                                            tuple[float, float]]]:
+def goal_positions(
+    size: str) -> dict[str, tuple[tuple[float, float],
+                                  tuple[float, float],
+                                  tuple[float, float],
+                                  tuple[float, float]]]:
     """Vertex goal positions accessed by color
 
     Order's inside out
@@ -433,13 +428,17 @@ def goal_positions(size: str) -> dict[str,
                    tuple[float, float]]]: goal pos
     """
     dist = SIZES[size]
-    return {color: (inner, second, third, outer)
-            for color, inner, second, third, outer
-            in zip(COLORS,
-                   create_pattern(dist, 0),
-                   create_pattern(dist*2, 0),
-                   create_pattern(dist*3, 0),
-                   create_pattern(dist*4, 0))}
+    return {color: tuple((factor_x*i*dist, factor_y*i*dist)
+                         for i in range(1, 5))
+            for color, (factor_x, factor_y)
+            in zip(COLORS, clockwise_pattern(1, 0))}
+    # return {color: (inner, second, third, outer)
+    #         for color, inner, second, third, outer
+    #         in zip(COLORS,
+    #                clockwise_pattern(dist, 0),
+    #                clockwise_pattern(dist*2, 0),
+    #                clockwise_pattern(dist*3, 0),
+    #                clockwise_pattern(dist*4, 0))}
 
 
 def get_goal_factors(color: str) -> tuple[float, float]:
@@ -451,7 +450,7 @@ def get_goal_factors(color: str) -> tuple[float, float]:
     Returns:
         tuple[float, float]: factors
     """
-    return dict(zip(COLORS, create_pattern(1, 0)))[color]
+    return dict(zip(COLORS, clockwise_pattern(1, 0)))[color]
 
 
 def home_positions(size: str) -> dict[str,
@@ -475,22 +474,10 @@ def home_positions(size: str) -> dict[str,
     return {color: (fir, sec, thi, fou)
             for color, fir, sec, thi, fou
             in zip(COLORS,
-                   create_pattern(dist*5 - dist//8),
-                   create_pattern(dist*4, dist*5 - dist//8),
-                   create_pattern(dist*5 - dist//8, dist*4),
-                   create_pattern(dist*4))}
-
-
-def get_home_factors(color: str) -> tuple[float, float]:
-    """Home factors for calculating home pos
-
-    Args:
-        color (str): color of game piece or player
-
-    Returns:
-        tuple[float, float]: factors
-    """
-    return dict(zip(COLORS, create_pattern(1)))[color]
+                   clockwise_pattern(dist*5 - dist//8),
+                   clockwise_pattern(dist*4, dist*5 - dist//8),
+                   clockwise_pattern(dist*5 - dist//8, dist*4),
+                   clockwise_pattern(dist*4))}
 
 
 def main():

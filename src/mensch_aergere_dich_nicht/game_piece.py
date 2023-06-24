@@ -5,9 +5,8 @@ This module represents a game piece
 from turtle import Screen, Turtle, exitonclick
 
 from game_board import (GAME_PIECE_COLORS, HOME_ANGLES, SIZES,
-                        get_goal_factors, get_home_factors, goal_positions,
-                        has_to_turn_left, has_to_turn_right, home_positions,
-                        starting_vertices)
+                        get_goal_factors, has_to_turn_left, has_to_turn_right,
+                        home_positions, starting_vertices)
 from tools import convert_Vec2D_to_tuple
 
 
@@ -65,8 +64,11 @@ class GamePiece:
         """Existence of a game piece means true"""
         return True
 
+    def __str__(self) -> str:
+        return f"{self.color = }\n{self.home_position = }\n{self.steps = }\n{self.is_done = }"
+
     def __repr__(self) -> str:
-        return f"{self.color =}\n{self.home_position = }\n{self.steps = }\n{self.is_done = }"
+        return f"GamePiece({self.board_size}, {self.color}, {self.home_position}, speed={self.turtle.speed()})"
 
     def move(self, steps: int):
         """Moving the turtle of the game piece
@@ -144,36 +146,16 @@ class GamePiece:
         """
         return convert_Vec2D_to_tuple(self.turtle.pos())
 
-    def is_on_field(self) -> bool:
-        """Returns if a game piece is on the field
-
-        On field means anywhere on the field except the home positions.
-        A game piece can already be on the goal and that counts as true
+    def in_home(self) -> bool:
+        """Returns if a game piece is home
 
         Returns:
             bool: true if game piece is on field
         """
-        return self.get_pos() not in home_positions(self.board_size)[self.color]
-        # return self.get_pos() != self.home_position
+        return self.get_pos() in home_positions(self.board_size)[self.color]
+        # return self.get_pos() == self.home_position
 
-    def is_done_(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool:
-        """Returns if a game piece shouldn't move anymore
-
-        A goal field is occupied when all the ongoing goal fields are occupied
-        and a game piece on it shouldn't move anymore
-
-        Args:
-            occupied_goal_fields (dict[tuple[float], bool]): dict of goal fields
-                                                             and if they are occupied
-
-        Returns:
-            bool: true if the game piece shouldn't move anymore
-        """
-        if self.get_pos() in occupied_goal_fields.keys():
-            return occupied_goal_fields[self.get_pos()]
-        return False
-
-    def in_goal(self) -> bool:
+    def in_goal(self) -> int:
         """Check method if game piece is in goal
 
         Returns:
@@ -205,12 +187,15 @@ class GamePiece:
             int: index of the goal position
         """
         if self.in_goal():
-            dist = SIZES[self.board_size]
-            x_pos, y_pos = self.get_pos()
-            return int(x_pos / dist) if x_pos != 0 else int(y_pos / dist)
-            for idx, pos in enumerate(goal_positions(self.board_size)[self.color]):
-                if pos == self.get_pos():
-                    return idx
+        dist = SIZES[self.board_size]
+        x_pos, y_pos = self.get_pos()
+        factor_x, factor_y = get_goal_factors(self.color)
+        x_set = {factor_x*i for i in range(1, 5)}
+        y_set = {factor_y*i for i in range(1, 5)}
+        if x_pos / dist in x_set and y_pos / dist in y_set:
+            if len(y_set) == 1:
+                return int(abs(x_pos) / dist) - 1
+            return int(abs(y_pos) / dist) - 1
         return -1
 
     def at_home(self) -> bool:

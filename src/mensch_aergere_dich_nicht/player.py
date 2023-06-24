@@ -5,10 +5,12 @@ Classes:
     Player
 """
 
-from itertools import chain
+from itertools import chain, product
+from turtle import exitonclick
 from typing import Optional
 
-from game_board import goal_positions, home_positions, two_vertices_fore_goal
+from game_board import (HOME_ANGLES, goal_positions, home_positions,
+                        two_vertices_fore_goal)
 from game_piece import GamePiece
 
 
@@ -51,8 +53,11 @@ class Player:
         """Existence of a player should be treated as True"""
         return True
 
+    def __str__(self) -> str:
+        return f"{self.color =}\n{self.game_pieces = }"
+
     def __repr__(self) -> str:
-        return f"{self.color =}\n{self.game_pieces = }\n{self.occupied = }"
+        return f"Player(board_size={self.board_size}, color={self.color}, game_pieces={self.game_pieces})"
 
     def get_valid_game_pieces(self, steps: int) -> list[GamePiece]:
         """Validates all potential moves that the player has
@@ -77,7 +82,7 @@ class Player:
         # if all game pieces are on home pos then all of them are valid
         are_home_pieces_valid = True
         for game_piece in self.game_pieces:
-            if game_piece.is_on_field():
+            if not game_piece.in_home():
                 are_home_pieces_valid = False
                 break
 
@@ -88,7 +93,8 @@ class Player:
 
         for game_piece in self.game_pieces:
             gp_pos = game_piece.get_pos()
-            if game_piece.is_done:
+            # filter of game piece being done or at home
+            if game_piece.is_done or game_piece.in_home():
                 continue
 
             # filter of having enough steps before goal
@@ -136,7 +142,7 @@ class Player:
 
         if steps < 4:
             for game_piece in game_pieces:
-                if game_piece.where_in_goal_index() >= steps:
+                if game_piece.in_goal() >= steps:
                     return game_piece
 
         pick = game_pieces[0]
@@ -176,45 +182,30 @@ class Player:
         Second is it on goal, if yes where.
         Third mark as done if it meets conditions
         """
-        for game_piece in self.game_pieces:
-            if game_piece.is_done:
+        break_counter = 0
+        for idx, (goal_pos, game_piece) in enumerate(product(goal_positions(self.board_size)[self.color], self.game_pieces)):
+            # print(game_piece.get_pos() == goal_pos)
+            if game_piece.get_pos() == goal_pos:
+                game_piece.is_done = True
+                break_counter = 0
                 continue
 
-            goal_idx = game_piece.where_in_goal_index()
-            if goal_idx == -1:
-                continue
+            break_counter += 1
 
-            for i in range(4):
-                if i == goal_idx == 0:
-                    game_piece.is_done = True
-                    break
-                elif i == goal_idx == 1:
-                    game_piece.is_done = True
-                    break
-                elif i == goal_idx == 2:
-                    game_piece.is_done = True
-                    break
-                elif i == goal_idx == 3:
-                    game_piece.is_done = True
-                    break
-            # gp_pos = game_piece.get_pos()
-            # for pos, flag in self.occupied.items():
-            #     if not flag:
-            #         idx = goal_positions[self.color].index(gp_pos)
-            #         if idx == 0:
-            #             self.occupied[pos] = True
-            #         elif idx == 1:
-            #             self.occupied[pos] = True
-            #         elif idx == 2:
-            #             self.occupied[pos] = True
-            #         elif idx == 3:
-            #             self.occupied[pos] = True
+            # print(f"{break_counter = }")
+            if break_counter == 4:
+                break
+
+            # print((idx + 1) % 4)
+            if (idx + 1) % 4 == 0:
+                # print("Inside of idx modulo 4")
+                break_counter = 0
 
     def place_game_piece_on_start(self) -> Optional[GamePiece]:
         """Puts a game piece of the assigned color on the starting vertex"""
         game_pieces_at_home: list[GamePiece] = []
         for game_piece in self.game_pieces:
-            if not game_piece.is_on_field():
+            if game_piece.in_home():
                 game_pieces_at_home.append(game_piece)
         # print(game_pieces_at_home)
         if game_pieces_at_home:
@@ -222,7 +213,7 @@ class Player:
             return game_pieces_at_home[0]
 
 
-def main():
+def main() -> None:
     """For testing and debugging purposes"""
     size = "medium"
     color1 = "yellow"

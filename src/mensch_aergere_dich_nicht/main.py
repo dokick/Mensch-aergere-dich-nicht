@@ -36,6 +36,7 @@ TODO:
   benutzt werden, funktioniert nicht
 """
 
+from itertools import cycle
 from random import choice
 from turtle import exitonclick  # pylint: disable=no-name-in-module
 from typing import Optional
@@ -83,7 +84,7 @@ def get_permission() -> bool:
     return False
 
 
-def make_a_move(*, current_player: Player, players: list[Player]) -> None:
+def make_a_move(*, steps: int, current_player: Player, players: list[Player]) -> None:
     """Simulates and also handles the move in the game
 
     If a player has no game pieces to play with,
@@ -102,7 +103,7 @@ def make_a_move(*, current_player: Player, players: list[Player]) -> None:
                                      players=players)
 
     if has_player_playable_game_pieces_on_board(current_player):
-        current_game_piece = current_player.move(dice())
+        current_game_piece = current_player.move(steps)
         did_player_hit_other_players(game_piece_being_checked=current_game_piece,
                                      players=players)
 
@@ -122,7 +123,7 @@ def has_player_playable_game_pieces_on_board(current_player: Player) -> bool:
         bool: true if at least one playable game piece of the color is on the board
     """
     for game_piece in current_player.game_pieces:
-        if game_piece.is_on_field() and not game_piece.is_done:
+        if not game_piece.in_home() and not game_piece.is_done:
             return True
     return False
 
@@ -152,7 +153,7 @@ def has_one_player_won(size: str, players: list[Player]) -> Optional[Player]:
 ############################## Start of setup & game loop ##############################
 
 
-def draw_winner(player: Player):
+def draw_winner(player: Player) -> None:
     """Draws winner by passing on the color of the player
 
     Args:
@@ -162,7 +163,7 @@ def draw_winner(player: Player):
 
 
 # pylint: disable-next=unused-argument
-def setup(size: str, amount_of_players: int) -> tuple[list[Player], Player]:
+def setup(size: str, amount_of_players: int) -> list[Player]:
     """A setup function so the game can start with initial values
 
     Args:
@@ -173,22 +174,25 @@ def setup(size: str, amount_of_players: int) -> tuple[list[Player], Player]:
         tuple[list[Player], Player]: first a tuple with all the players,
                                      second the player that starts the game
     """
+    # setup the starting color
+    starting_color = choice(COLORS)
+    index_of_starting_color = COLORS.index(starting_color)
+    colors = COLORS[index_of_starting_color:] + COLORS[:index_of_starting_color]
+
     players: list[Player] = []
-    for color in COLORS:
+    for color in colors:
         players.append(Player(board_size=size, color=color, game_pieces=[GamePiece(
             size, color, home_positions(size)[color][i], speed=3) for i in range(4)]))
 
-    for player, color in zip(players, COLORS):
+    for player, color in zip(players, colors):
         for game_piece in player.game_pieces:
             game_piece.turtle.seth(HOME_ANGLES[color])
             game_piece.turtle.goto(game_piece.home_position)
 
-    starting_player = choice(players)
-
-    return players, starting_player
+    return players
 
 
-def start_game_loop(size: str, amount_of_players: int = 4):
+def start_game_loop(size: str, amount_of_players: int = 4) -> None:
     """Starts the game loop
 
     Loop works as follows:
@@ -202,26 +206,28 @@ def start_game_loop(size: str, amount_of_players: int = 4):
         amount_of_players (int, optional): amount of players that are playing (not implemented yet).
                                            Defaults to 4.
     """
-    players, current_player = setup(size, amount_of_players)
-    index_of_current_player = players.index(current_player)
+    players = setup(size, amount_of_players)
     won_player: Optional[Player] = None
-    iterations = 0
 
-    while not won_player:
-        make_a_move(current_player=current_player, players=players)
-        index_of_current_player += 1
-        current_player = players[(index_of_current_player+1) % 4]
-        won_player = has_one_player_won(size, players)
+    iterations = 0
+    for player in cycle(players):
+        dice_results = [dice()]
+        while dice_results[-1] == 6:
+            dice_results.append(dice())
+        for steps in dice_results:
+            make_a_move(steps=steps, current_player=player, players=players)
+            won_player = has_one_player_won(size, players)
         iterations += 1
-        if iterations == 300:
+        if won_player or iterations > 300:
             break
-    print(f"{iterations =}")
+
+    print(f"{iterations = }")
     if isinstance(won_player, Player):
         print(f"{won_player.color} has won the game")
         draw_winner(won_player)
 
 
-def start_game(size: str = "medium"):
+def start_game(size: str = "medium") -> None:
     """Starts game
 
     Args:
@@ -235,9 +241,9 @@ def start_game(size: str = "medium"):
 ############################## End of start & game loop ##############################
 
 
-def main():
+def main() -> None:
     """pylint shut up"""
-    start_game("small")
+    start_game("medium")
 
 
 if __name__ == "__main__":
