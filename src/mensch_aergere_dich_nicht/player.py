@@ -21,8 +21,6 @@ class Player:
         color (str): color of the player
         game_pieces (list[GamePiece]): all game pieces of the same color
                                        assigned to a player
-        occupied (dict[tuple[float], bool]): dict of the goal positions with a marker,
-                                             true means occupied
 
     Methods:
         __init__(self, *, board_size: str, color: str, game_pieces: list[GamePiece]) -> None
@@ -30,9 +28,9 @@ class Player:
         __repr__(self) -> str
         get_valid_game_pieces(self, steps: int) -> list[GamePiece]
         pick_game_piece(self, steps: int) -> GamePiece
-        move(self, steps: int) -> None
+        move(self, steps: int) -> Optional[GamePiece]
         check_if_done(self) -> None
-        place_game_piece_on_start(self) -> None
+        place_game_piece_on_start(self) -> Optional[GamePiece]
     """
 
     def __init__(self, *, board_size: str, color: str, game_pieces: list[GamePiece]) -> None:

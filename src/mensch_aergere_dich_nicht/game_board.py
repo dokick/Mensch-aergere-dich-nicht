@@ -3,25 +3,15 @@ This module draws the game board
 and generates all necessary position coordinates inside of dicts or tuples
 
 Functions:
-    create_pattern(x: float, y: Optional[float] = None) -> tuple[tuple[float, float],
+    clockwise_pattern(x: float, y: Optional[float] = None) -> tuple[tuple[float, float],
                                                                  tuple[float, float],
                                                                  tuple[float, float],
                                                                  tuple[float, float]]
-    create_pattern_as_list(x: float, y: Optional[float] = None) -> list[list[float]]
+    clockwise_pattern_as_list(x: float, y: Optional[float] = None) -> list[list[float]]
     game_board(size: str = "medium") -> None
     draw_winner_on_board(color: str)
-    vertices_for_left_turn(size: str) -> tuple[tuple[float, float],
-                                               tuple[float, float],
-                                               tuple[float, float],
-                                               tuple[float, float]]
-    vertices_for_right_turn(size: str) -> tuple[tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float]]
+    has_to_turn_left(x: float, y: float, /, size: str) -> bool
+    has_to_turn_right(x: float, y: float, /, size: str, color: str) -> bool
     starting_vertices(size: str) -> dict[str, tuple[float, float]]
     vertex_fore_goal(size: str) -> dict[str, tuple[float, float]]
     two_vertices_fore_goal(size: str) -> dict[str,
@@ -32,6 +22,7 @@ Functions:
                                             tuple[float, float],
                                             tuple[float, float],
                                             tuple[float, float]]]
+    get_goal_factors(color: str) -> tuple[float, float]
     home_positions(size: str) -> dict[str,
                                       tuple[tuple[float, float],
                                             tuple[float, float],

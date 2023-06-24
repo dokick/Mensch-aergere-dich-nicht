@@ -1,5 +1,4 @@
-"""
-Behaviour of players:
+"""Behaviour of players:
 
 - First priority is it to get the furthest game piece into one of the final
   positions, no matter the risks or tactical advantages for other game pieces
@@ -47,7 +46,7 @@ from game_piece import GamePiece
 from player import Player
 from tools import dice
 
-############################## Start of game mechanics ##############################
+############################ Start of game mechanics ###########################
 
 
 def did_player_hit_other_players(*, game_piece_being_checked: Optional[GamePiece],
@@ -92,6 +91,7 @@ def make_a_move(*, steps: int, current_player: Player, players: list[Player]) ->
     Otherwise the move gets validated and then the player moves
 
     Args:
+        steps (int): number of steps
         current_player (Player): the player that has the current turn
         players (list[Player]): information of all players
     """
@@ -108,9 +108,9 @@ def make_a_move(*, steps: int, current_player: Player, players: list[Player]) ->
                                      players=players)
 
 
-############################## End of game mechanics ##############################
+############################# End of game mechanics ############################
 
-############################## Start of helper functions ##############################
+########################### Start of helper functions ##########################
 
 
 def has_player_playable_game_pieces_on_board(current_player: Player) -> bool:
@@ -148,9 +148,9 @@ def has_one_player_won(size: str, players: list[Player]) -> Optional[Player]:
             return player
     return None
 
-############################## End of helper functions ##############################
+############################ End of helper functions ###########################
 
-############################## Start of setup & game loop ##############################
+########################## Start of setup & game loop ##########################
 
 
 def draw_winner(player: Player) -> None:
@@ -171,8 +171,8 @@ def setup(size: str, amount_of_players: int) -> list[Player]:
         amount_of_players (int): the amount of players in the game (not implemented yet)
 
     Returns:
-        tuple[list[Player], Player]: first a tuple with all the players,
-                                     second the player that starts the game
+        list[Player]: first a tuple with all the players,
+                      second the player that starts the game
     """
     # setup the starting color
     starting_color = choice(COLORS)
@@ -238,7 +238,7 @@ def start_game(size: str = "medium") -> None:
     exitonclick()
 
 
-############################## End of start & game loop ##############################
+########################### End of start & game loop ###########################
 
 
 def main() -> None:

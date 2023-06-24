@@ -30,10 +30,8 @@ class GamePiece:
         reset(self) -> GamePiece
         get_future_pos(self, steps: int) -> tuple[float, float]
         get_pos(self) -> tuple[float, float]
-        is_on_field(self) -> bool
-        is_done_(self, occupied_goal_fields: dict[tuple[float], bool]) -> bool
-        is_in_goal(self) -> bool
-        where_in_goal_index(self) -> int
+        in_home(self) -> bool
+        in_goal(self) -> int
     """
 
     def __init__(self, board_size: str, color: str, home_position: tuple[float, float],
@@ -150,7 +148,7 @@ class GamePiece:
         """Returns if a game piece is home
 
         Returns:
-            bool: true if game piece is on field
+            bool: true if game piece is home
         """
         return self.get_pos() in home_positions(self.board_size)[self.color]
         # return self.get_pos() == self.home_position
