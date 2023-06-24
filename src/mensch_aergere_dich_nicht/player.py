@@ -44,8 +44,6 @@ class Player:
         self.board_size = board_size
         self.color = color
         self.game_pieces = game_pieces
-        self.occupied: dict[tuple[float], bool] = {
-            pos: False for pos in goal_positions(self.board_size)[self.color]}
 
     def __bool__(self) -> bool:
         """Existence of a player should be treated as True"""
