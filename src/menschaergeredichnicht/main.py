@@ -174,7 +174,7 @@ def setup(size: str, amount_of_players: int) -> list[Player]:
         list[Player]: first a tuple with all the players,
                       second the player that starts the game
     """
-    # setup the starting color
+    # set up the starting color
     starting_color = choice(COLORS)
     index_of_starting_color = COLORS.index(starting_color)
     colors = COLORS[index_of_starting_color:] + COLORS[:index_of_starting_color]

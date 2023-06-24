@@ -1,16 +1,13 @@
-"""
-This module represents a player
+"""This module represents a player
 
 Classes:
     Player
 """
 
 from itertools import chain, product
-from turtle import exitonclick
 from typing import Optional
 
-from game_board import (HOME_ANGLES, goal_positions, home_positions,
-                        two_vertices_fore_goal)
+from game_board import goal_positions, home_positions, two_vertices_fore_goal
 from game_piece import GamePiece
 
 
@@ -213,7 +210,7 @@ def main() -> None:
     """For testing and debugging purposes"""
     size = "medium"
     color1 = "yellow"
-    player1 = Player(board_size = size,
+    player1 = Player(board_size=size,
                      color=color1,
                      game_pieces=[GamePiece(size,
                                             color1,

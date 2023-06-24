@@ -1,6 +1,4 @@
-"""
-This module represents a game piece
-"""
+"""This module represents a game piece"""
 # pylint: disable-next=no-name-in-module
 from turtle import Screen, Turtle, exitonclick
 
@@ -36,7 +34,7 @@ class GamePiece:
 
     def __init__(self, board_size: str, color: str, home_position: tuple[float, float],
                  *, speed: int = 0) -> None:
-        """Initialzing attributes and setting up turtle
+        """Initializing attributes and setting up turtle
 
         Args:
             board_size (str): size of game board. look into SIZES for sizes
@@ -109,7 +107,7 @@ class GamePiece:
         return self
 
     def get_future_pos(self, steps: int) -> tuple[float, float]:
-        """Calculates the furure position of the game piece's turtle
+        """Calculates the future position of the game piece's turtle
 
         Args:
             steps (int): amount of steps the game piece goes
@@ -186,7 +184,7 @@ def main():
     print(not game_piece)  # False
 
     game_piece.turtle.goto(-80, 0)
-    print(game_piece.where_in_goal_index())
+    print(game_piece.in_goal())
 
     return
     game_piece.turtle.goto(home_position)

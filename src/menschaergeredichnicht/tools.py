@@ -1,5 +1,4 @@
-"""
-This module is just a collection of useful functions.
+"""This module is just a collection of useful functions.
 
 Functions:
     convert_Vec2D_to_tuple(pos: Vec2D) -> tuple[float, float]
@@ -32,7 +31,7 @@ def dice() -> int:
     """Simulates rolling a dice
 
     Returns:
-        int: Random integer betweeen 1 and 6
+        int: Random integer between 1 and 6
     """
     return randint(1, 6)
 

@@ -1,6 +1,5 @@
-"""
-This module draws the game board
-and generates all necessary position coordinates inside of dicts or tuples
+"""This module draws the game board
+and generates all necessary position coordinates inside dicts or tuples
 
 Functions:
     clockwise_pattern(x: float, y: Optional[float] = None) -> tuple[tuple[float, float],
@@ -310,22 +309,22 @@ def starting_vertices(size: str) -> dict[str, tuple[float, float]]:
 
 
 def vertex_fore_goal(size: str) -> dict[str, tuple[float, float]]:
-    """Vertex position accessed by color infront of the goal positon,
+    """Vertex position accessed by color in front of the goal position,
     so a game piece doesn't travel in an endless loop on the game board
 
     Args:
         size (str): size of game board. look into SIZES for sizes
 
     Returns:
-        dict[str, tuple[float, float]]: vertex infront of goal pos
+        dict[str, tuple[float, float]]: vertex in front of goal pos
     """
     dist = SIZES[size]
     return dict(zip(COLORS, clockwise_pattern(dist*5, 0)))
 
 
 def two_vertices_fore_goal(
-    size: str) -> dict[str, tuple[tuple[float, float], tuple[float, float]]]:
-    """Vertex positions accessed by color that are two steps infront of the goal.
+        size: str) -> dict[str, tuple[tuple[float, float], tuple[float, float]]]:
+    """Vertex positions accessed by color that are two steps in front of the goal.
     Used to ensure that there are enough vertices a game piece can travel
 
     Args:
@@ -334,7 +333,7 @@ def two_vertices_fore_goal(
     Returns:
         dict[str,
              tuple[tuple[float, float],
-                   tuple[float, float]]]: vertices two steps infront of goal pos
+                   tuple[float, float]]]: vertices two steps in front of goal pos
     """
     dist = SIZES[size]
     rev_vert_4_goal = list(reversed(clockwise_pattern_as_list(dist*5, dist)))
