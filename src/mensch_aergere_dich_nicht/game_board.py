@@ -296,52 +296,6 @@ def has_to_turn_right(x: float, y: float, /, size: str, color: str) -> bool:
             or (x == factor_x*dist and y == factor_y*dist))
 
 
-def vertices_for_left_turn(size: str) -> tuple[tuple[float, float],
-                                               tuple[float, float],
-                                               tuple[float, float],
-                                               tuple[float, float]]:
-    """Vertex positions where a game piece has to turn left
-
-    Args:
-        size (str): size of game board. look into SIZES for sizes
-
-    Returns:
-        tuple[tuple[float, float],
-              tuple[float, float],
-              tuple[float, float],
-              tuple[float, float]]: vertices for left turn
-    """
-    dist = SIZES[size]
-    return create_pattern(dist)
-
-
-def vertices_for_right_turn(size: str) -> tuple[tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float],
-                                                tuple[float, float]]:
-    """Vertex positions where a game piece has to turn right
-
-    Args:
-        size (str): size of game board. look into SIZES for sizes
-
-    Returns:
-        tuple[tuple[float, float],
-              tuple[float, float],
-              tuple[float, float],
-              tuple[float, float],
-              tuple[float, float],
-              tuple[float, float],
-              tuple[float, float],
-              tuple[float, float]]: vertices for right turn
-    """
-    dist = SIZES[size]
-    return (create_pattern(dist, dist*5) + create_pattern(dist*5, dist))
-
-
 def starting_vertices(size: str) -> dict[str, tuple[float, float]]:
     """Vertex position accessed by color where a game piece starts
 
