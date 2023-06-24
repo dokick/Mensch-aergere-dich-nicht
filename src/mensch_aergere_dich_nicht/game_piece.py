@@ -156,27 +156,6 @@ class GamePiece:
     def in_goal(self) -> int:
         """Check method if game piece is in goal
 
-        Returns:
-            bool: true if game piece is somewhere on the goal positions
-        """
-        return self.get_pos() in goal_positions(self.board_size)[self.color]
-
-    def in_goal2(self) -> bool:
-        """Check method if game piece is in goal
-
-        Returns:
-            bool: true if game piece is somewhere on the goal positions
-        """
-        dist = SIZES[self.board_size]
-        x_pos, y_pos = self.get_pos()
-        factor_x, factor_y = get_goal_factors(self.color)
-        x_set = {factor_x*i for i in range(1, 5)}
-        y_set = {factor_y*i for i in range(1, 5)}
-        return x_pos / dist in x_set and y_pos / dist in y_set
-
-    def where_in_goal_index(self) -> int:
-        """Getting the goal position of a game piece via index
-
         0 is the most inner position.
         3 the most outer position.
         -1 if not in goal
@@ -184,7 +163,6 @@ class GamePiece:
         Returns:
             int: index of the goal position
         """
-        if self.in_goal():
         dist = SIZES[self.board_size]
         x_pos, y_pos = self.get_pos()
         factor_x, factor_y = get_goal_factors(self.color)
@@ -195,17 +173,6 @@ class GamePiece:
                 return int(abs(x_pos) / dist) - 1
             return int(abs(y_pos) / dist) - 1
         return -1
-
-    def at_home(self) -> bool:
-        """Check method if game piece at home
-
-        Returns:
-            bool: true if at home
-        """
-        dist = SIZES[self.board_size]
-        factor_x, factor_y = get_home_factors(self.color)
-        # TODO: WIP
-        return False
 
 
 def main():
