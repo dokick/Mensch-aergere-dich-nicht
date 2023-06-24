@@ -88,7 +88,7 @@ def make_a_move(*, steps: int, current_player: Player, players: list[Player]) ->
 
     If a player has no game pieces to play with,
     the player has to get a new game piece on the board.
-    Otherwise the move gets validated and then the player moves
+    Otherwise, the move gets validated and then the player moves
 
     Args:
         steps (int): number of steps
